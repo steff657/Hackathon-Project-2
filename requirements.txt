@@ -1,3 +1,7 @@
 # Core framework
 Django==6.0.2
 django-allauth==65.14.3
+gunicorn==23.0.0
+dj-database-url==2.2.0
+whitenoise==6.8.2
+psycopg2-binary==2.9.10
