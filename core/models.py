@@ -48,6 +48,11 @@ class Court(models.Model):
 
 
 class Booking(models.Model):
+    class PaymentStatus(models.TextChoices):
+        PENDING = "pending", "Pending"
+        PAID = "paid", "Paid"
+        CANCELLED = "cancelled", "Cancelled"
+
     class Surface(models.TextChoices):
         HARD = "hard", "Hard"
         CLAY = "clay", "Clay"
@@ -72,6 +77,13 @@ class Booking(models.Model):
         blank=True,
         null=True,
     )
+    payment_status = models.CharField(
+        max_length=20,
+        choices=PaymentStatus.choices,
+        default=PaymentStatus.PENDING,
+    )
+    stripe_checkout_session_id = models.CharField(max_length=255, blank=True)
+    paid_at = models.DateTimeField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

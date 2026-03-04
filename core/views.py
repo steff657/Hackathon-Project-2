@@ -1,8 +1,12 @@
+import stripe
 from datetime import date
 from django import forms as django_forms
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
 from django.http import HttpResponseForbidden
+from django.http import HttpResponseNotAllowed
 from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.shortcuts import render
@@ -10,9 +14,52 @@ from django.urls import reverse
 from django.utils.html import format_html
 from django.utils import timezone
 from django.views.decorators.http import require_POST
+from django.views.decorators.csrf import csrf_exempt
+
 
 from .forms import BookingForm
 from .models import Booking, Court, SavedSlot
+
+
+def _create_checkout_session(request, booking):
+    if not settings.STRIPE_SECRET_KEY:
+        raise ValueError("Stripe secret key is not configured.")
+
+    stripe.api_key = settings.STRIPE_SECRET_KEY
+    success_url = request.build_absolute_uri(reverse("payment_success"))
+    cancel_url = request.build_absolute_uri(reverse("payment_cancel"))
+
+    session = stripe.checkout.Session.create(
+        mode="payment",
+        payment_method_types=["card"],
+        customer_email=booking.player_email,
+        metadata={
+            "booking_id": str(booking.id),
+            "user_id": str(request.user.id),
+        },
+        line_items=[
+            {
+                "quantity": 1,
+                "price_data": {
+                    "currency": settings.STRIPE_CURRENCY,
+                    "unit_amount": settings.STRIPE_BOOKING_PRICE_PENCE,
+                    "product_data": {
+                        "name": f"Court {booking.court_number} booking",
+                        "description": (
+                            f"{booking.date:%d %b %Y} at "
+                            f"{booking.start_time:%H:%M}"
+                        ),
+                    },
+                },
+            }
+        ],
+        success_url=f"{success_url}?session_id={{CHECKOUT_SESSION_ID}}",
+        cancel_url=f"{cancel_url}?booking_id={booking.id}",
+    )
+
+    booking.stripe_checkout_session_id = session.id
+    booking.save(update_fields=["stripe_checkout_session_id"])
+    return session
 
 
 def _safe_next_url(next_url, fallback_name):
@@ -139,14 +186,28 @@ def book_court(request):
         if form.is_valid():
             booking = form.save(commit=False)
             booking.owner = request.user
+            booking.payment_status = Booking.PaymentStatus.PENDING
             booking.save()
 
-            messages.success(
-                request,
-                _build_booking_reminder_message(booking),
-                extra_tags="booking-reminder",
-            )
-            return redirect("my_bookings")
+            try:
+                checkout_session = _create_checkout_session(request, booking)
+            except ValueError:
+                messages.error(
+                    request,
+                    "Stripe is not configured yet. Please contact support.",
+                )
+                return redirect("my_bookings")
+            except stripe.error.StripeError as exc:
+                messages.error(
+                    request,
+                    (
+                        "Could not start payment checkout right now. "
+                        f"Please try again. ({getattr(exc, 'user_message', '')})"
+                    ),
+                )
+                return redirect("my_bookings")
+
+            return redirect(checkout_session.url, permanent=False)
     else:
         form = BookingForm(initial=initial_data)
 
@@ -208,6 +269,36 @@ def edit_booking(request, booking_id):
             "booking": booking,
         },
     )
+
+
+@login_required
+@require_POST
+def pay_booking(request, booking_id):
+    booking = get_object_or_404(Booking, pk=booking_id, owner=request.user)
+
+    if booking.payment_status == Booking.PaymentStatus.PAID:
+        messages.info(request, "This booking is already paid.")
+        return redirect("my_bookings")
+
+    try:
+        checkout_session = _create_checkout_session(request, booking)
+    except ValueError:
+        messages.error(
+            request,
+            "Stripe is not configured yet. Please contact support.",
+        )
+        return redirect("my_bookings")
+    except stripe.error.StripeError as exc:
+        messages.error(
+            request,
+            (
+                "Could not start payment checkout right now. "
+                f"Please try again. ({getattr(exc, 'user_message', '')})"
+            ),
+        )
+        return redirect("my_bookings")
+
+    return redirect(checkout_session.url, permanent=False)
 
 
 @login_required
@@ -335,3 +426,83 @@ def cancel_booking(request, booking_id):
     messages.success(request, "Booking cancelled successfully.")
     return redirect("my_bookings")
 
+
+@login_required
+def payment_success(request):
+    session_id = request.GET.get("session_id", "")
+    booking = None
+    if session_id:
+        booking = Booking.objects.filter(
+            owner=request.user,
+            stripe_checkout_session_id=session_id,
+        ).first()
+    return render(
+        request,
+        "core/payment_success.html",
+        {
+            "booking": booking,
+        },
+    )
+
+
+@login_required
+def payment_cancel(request):
+    booking_id = request.GET.get("booking_id")
+    booking = None
+    if booking_id:
+        booking = Booking.objects.filter(
+            pk=booking_id,
+            owner=request.user,
+        ).first()
+    return render(
+        request,
+        "core/payment_cancel.html",
+        {
+            "booking": booking,
+        },
+    )
+
+
+@csrf_exempt
+def stripe_webhook(request):
+    if request.method != "POST":
+        return HttpResponseNotAllowed(["POST"])
+
+    if not settings.STRIPE_WEBHOOK_SECRET:
+        return HttpResponse(status=400)
+
+    payload = request.body
+    sig_header = request.META.get("HTTP_STRIPE_SIGNATURE")
+
+    try:
+        event = stripe.Webhook.construct_event(
+            payload,
+            sig_header,
+            settings.STRIPE_WEBHOOK_SECRET
+        )
+    except ValueError:
+        return HttpResponse(status=400)
+    except stripe.error.SignatureVerificationError:
+        return HttpResponse(status=400)
+
+    if event["type"] == "checkout.session.completed":
+        session = event["data"]["object"]
+        metadata = session.get("metadata", {})
+        booking_id = metadata.get("booking_id")
+
+        if booking_id:
+            booking = Booking.objects.filter(pk=booking_id).first()
+            if booking and booking.payment_status != Booking.PaymentStatus.PAID:
+                booking.payment_status = Booking.PaymentStatus.PAID
+                booking.paid_at = timezone.now()
+                if session.get("id"):
+                    booking.stripe_checkout_session_id = session["id"]
+                booking.save(
+                    update_fields=[
+                        "payment_status",
+                        "paid_at",
+                        "stripe_checkout_session_id",
+                    ]
+                )
+
+    return HttpResponse(status=200)

@@ -1,0 +1,20 @@
+{% extends "core/base.html" %}
+
+{% block title %}Payment Received{% endblock %}
+
+{% block content %}
+<div class="card card-soft">
+  <div class="card-body p-4">
+    <h1 class="h3 mb-3">Payment received</h1>
+    <p>
+      Thank you. Your payment has been received.
+      {% if booking and booking.payment_status == "paid" %}
+        Your booking is now marked as paid.
+      {% else %}
+        Your booking will be confirmed once it is processed.
+      {% endif %}
+    </p>
+    <a href="{% url 'my_bookings' %}" class="btn btn-accent">Go to My Bookings</a>
+  </div>
+</div>
+{% endblock %}
