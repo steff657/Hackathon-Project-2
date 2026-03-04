@@ -98,7 +98,7 @@ ROOT_URLCONF = 'booking_app.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'html_templates')],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -174,3 +174,29 @@ SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 # Extra settings from packages
 SITE_ID = 1
+
+# Login settings for django-allauth
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
+    "allauth.account.auth_backends.AuthenticationBackend",
+]
+
+# Account settings
+ACCOUNT_LOGIN_REDIRECT_URL = "my_bookings"
+ACCOUNT_LOGOUT_REDIRECT_URL = "home"
+
+ACCOUNT_LOGIN_METHODS = {"username", "email"}
+
+ACCOUNT_SIGNUP_FIELDS = [
+    "email*",
+    "username*",
+    "password1*",
+    "password2*",
+]
+
+ACCOUNT_EMAIL_VERIFICATION = "none"
+
+# Custom signup form
+ACCOUNT_FORMS = {
+    "signup": "core.forms.CustomSignupForm",
+}
