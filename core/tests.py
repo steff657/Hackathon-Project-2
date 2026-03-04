@@ -5,18 +5,19 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 
-from .admin import BookingAdmin
-from .models import Booking
+from .admin import BookingAdmin, CourtAdmin
+from .models import Booking, Court
 
 
 class BookingAdminTests(TestCase):
     def setUp(self):
+        court = Court.objects.first()
         self.booking = Booking.objects.create(
             player_name="Alice Example",
             player_email="alice@example.com",
             date=date(2026, 3, 5),
             start_time=time(10, 0),
-            court_number=2,
+            court_number=court.number,
         )
         user_model = get_user_model()
         self.superuser = user_model.objects.create_superuser(
@@ -57,3 +58,103 @@ class BookingAdminTests(TestCase):
         self.client.force_login(self.user)
         response = self.client.get(reverse("admin:index"))
         self.assertEqual(response.status_code, 302)
+
+
+class CourtAdminTests(TestCase):
+    def test_court_registered_in_admin(self):
+        self.assertIn(Court, admin.site._registry)
+        self.assertIsInstance(admin.site._registry[Court], CourtAdmin)
+
+    def test_court_admin_configuration(self):
+        model_admin = admin.site._registry[Court]
+        self.assertEqual(
+            model_admin.list_display,
+            ("number", "surface", "is_available", "maintenance_start", "maintenance_end"),
+        )
+        self.assertEqual(model_admin.list_filter, ("is_available", "surface", "indoors"))
+        self.assertEqual(model_admin.list_editable, ("is_available",))
+
+
+class AvailabilityBookingTests(TestCase):
+    def setUp(self):
+        self.available_court = Court.objects.create(
+            number=10,
+            surface=Court.Surface.HARD,
+            is_available=True,
+        )
+        self.unavailable_court = Court.objects.create(
+            number=11,
+            surface=Court.Surface.CLAY,
+            is_available=False,
+            maintenance_reason="Local event",
+        )
+        self.maintenance_court = Court.objects.create(
+            number=12,
+            surface=Court.Surface.GRASS,
+            is_available=True,
+            maintenance_start=date(2026, 3, 10),
+            maintenance_end=date(2026, 3, 12),
+            maintenance_reason="Net replacement",
+        )
+
+    def test_unavailable_court_is_not_shown_in_courts_page(self):
+        response = self.client.get(reverse("courts"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Court 10")
+        self.assertNotContains(response, "Court 11")
+
+    def test_cannot_book_unavailable_court(self):
+        response = self.client.post(
+            reverse("book_court"),
+            {
+                "player_name": "Player One",
+                "player_email": "player@example.com",
+                "date": "2026-03-11",
+                "start_time": "10:00",
+                "duration_minutes": 60,
+                "court_number": 11,
+                "notes": "Test booking",
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Court is unavailable")
+        self.assertEqual(Booking.objects.count(), 0)
+
+    def test_cannot_book_court_during_maintenance_window(self):
+        response = self.client.post(
+            reverse("book_court"),
+            {
+                "player_name": "Player Two",
+                "player_email": "player2@example.com",
+                "date": "2026-03-11",
+                "start_time": "11:00",
+                "duration_minutes": 60,
+                "court_number": 12,
+                "notes": "Test booking",
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "under maintenance")
+        self.assertEqual(Booking.objects.count(), 0)
+
+    def test_existing_bookings_stay_visible_even_if_court_becomes_unavailable(self):
+        Booking.objects.create(
+            player_name="Legacy Booking",
+            player_email="legacy@example.com",
+            date=date(2026, 3, 15),
+            start_time=time(9, 0),
+            court_number=self.available_court.number,
+            surface=self.available_court.surface,
+        )
+        self.available_court.is_available = False
+        self.available_court.save()
+
+        response = self.client.get(reverse("my_bookings"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Legacy Booking")
+
+    def test_booking_page_shows_clear_message_if_no_courts_available(self):
+        Court.objects.update(is_available=False)
+        response = self.client.get(reverse("book_court"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "No courts are available right now")

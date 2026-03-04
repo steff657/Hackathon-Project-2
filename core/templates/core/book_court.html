@@ -4,6 +4,11 @@
 
 {% block content %}
 <h1 class="mb-4">Book a Court</h1>
+{% if not has_any_available_court %}
+  <div class="alert alert-warning">
+    No courts are available right now. Please check back later.
+  </div>
+{% endif %}
 <div class="card card-soft">
   <div class="card-body p-4">
     <form method="post" class="row g-3">
@@ -18,7 +23,9 @@
         </div>
       {% endfor %}
       <div class="col-12">
-        <button type="submit" class="btn btn-accent">Confirm Booking</button>
+        <button type="submit" class="btn btn-accent" {% if not has_any_available_court %}disabled{% endif %}>
+          Confirm Booking
+        </button>
       </div>
     </form>
   </div>

@@ -1,6 +1,15 @@
 from django.contrib import admin
 
-from .models import Booking
+from .models import Booking, Court
+
+
+@admin.register(Court)
+class CourtAdmin(admin.ModelAdmin):
+    list_display = ("number", "surface", "is_available", "maintenance_start", "maintenance_end")
+    list_filter = ("is_available", "surface", "indoors")
+    list_editable = ("is_available",)
+    search_fields = ("=number", "maintenance_reason")
+    ordering = ("number",)
 
 
 @admin.register(Booking)

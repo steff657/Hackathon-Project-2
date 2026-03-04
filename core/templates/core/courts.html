@@ -10,10 +10,14 @@
       <article class="card card-soft h-100">
         <div class="card-body">
           <h2 class="h5">Court {{ court.number }}</h2>
-          <p class="mb-1"><strong>Surface:</strong> {{ court.surface }}</p>
+          <p class="mb-1"><strong>Surface:</strong> {{ court.get_surface_display }}</p>
           <p class="mb-0"><strong>Type:</strong> {% if court.indoors %}Indoor{% else %}Outdoor{% endif %}</p>
         </div>
       </article>
+    </div>
+  {% empty %}
+    <div class="col-12">
+      <div class="alert alert-warning mb-0">No courts are currently available.</div>
     </div>
   {% endfor %}
 </div>

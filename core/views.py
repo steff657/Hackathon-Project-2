@@ -1,11 +1,11 @@
 from datetime import date
 
 from django.contrib import messages
-from django.shortcuts import render
 from django.shortcuts import redirect
+from django.shortcuts import render
 
 from .forms import BookingForm
-from .models import Booking
+from .models import Booking, Court
 
 
 def home(request):
@@ -17,11 +17,9 @@ def home(request):
 
 
 def courts(request):
+    today = date.today()
     courts_data = [
-        {"number": 1, "surface": "Hard", "indoors": False},
-        {"number": 2, "surface": "Hard", "indoors": False},
-        {"number": 3, "surface": "Clay", "indoors": False},
-        {"number": 4, "surface": "Grass", "indoors": True},
+        court for court in Court.objects.order_by("number") if court.is_available_on(today)
     ]
     return render(request, "core/courts.html", {"courts": courts_data})
 
@@ -36,7 +34,12 @@ def book_court(request):
     else:
         form = BookingForm()
 
-    return render(request, "core/book_court.html", {"form": form})
+    has_any_available_court = Court.objects.filter(is_available=True).exists()
+    return render(
+        request,
+        "core/book_court.html",
+        {"form": form, "has_any_available_court": has_any_available_court},
+    )
 
 
 def my_bookings(request):
