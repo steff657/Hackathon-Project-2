@@ -4,8 +4,10 @@
 
 {% block content %}
 <h1 class="mb-4">My Bookings</h1>
-<div class="card card-soft">
+{% if upcoming_bookings or past_bookings %}
+<div class="card card-soft mb-4">
   <div class="card-body p-0">
+    <h2 class="h5 px-3 pt-3 mb-2">Upcoming Bookings</h2>
     <div class="table-responsive">
       <table class="table table-hover mb-0">
         <thead>
@@ -15,17 +17,19 @@
             <th>Time</th>
             <th>Court</th>
             <th>Surface</th>
+            <th>Status</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
-          {% for booking in bookings %}
+          {% for booking in upcoming_bookings %}
             <tr>
               <td>{{ booking.player_name }}</td>
               <td>{{ booking.date }}</td>
               <td>{{ booking.start_time|time:"H:i" }}</td>
               <td>{{ booking.court_number }}</td>
               <td>{{ booking.get_surface_display }}</td>
+              <td><span class="badge text-bg-success">Upcoming</span></td>
               <td>
                 <form method="post" action="{% url 'cancel_booking' booking.id %}" class="d-inline">
                   {% csrf_token %}
@@ -35,7 +39,7 @@
             </tr>
           {% empty %}
             <tr>
-              <td colspan="6" class="text-center py-4">No bookings yet. Create your first one from the Book a Court page.</td>
+              <td colspan="7" class="text-center py-4">No upcoming bookings.</td>
             </tr>
           {% endfor %}
         </tbody>
@@ -43,4 +47,62 @@
     </div>
   </div>
 </div>
+
+<div class="card card-soft{% if not upcoming_bookings %} mt-0{% endif %}">
+  <div class="card-body p-0">
+    <h2 class="h5 px-3 pt-3 mb-2">Past Bookings</h2>
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Date</th>
+            <th>Time</th>
+            <th>Court</th>
+            <th>Surface</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for booking in past_bookings %}
+            <tr>
+              <td>{{ booking.player_name }}</td>
+              <td>{{ booking.date }}</td>
+              <td>{{ booking.start_time|time:"H:i" }}</td>
+              <td>{{ booking.court_number }}</td>
+              <td>{{ booking.get_surface_display }}</td>
+              <td><span class="badge text-bg-secondary">Past</span></td>
+              <td>
+                <a
+                  href="{% url 'book_court' %}?court_number={{ booking.court_number }}&start_time={{ booking.start_time|time:'H:i' }}"
+                  class="btn btn-sm btn-outline-success btn-glow"
+                >
+                  Rebook this court/time
+                </a>
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="7" class="text-center py-4">No past bookings yet.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% else %}
+<div class="row justify-content-center">
+  <div class="col-12 col-md-9 col-lg-7 col-xl-6">
+    <div class="card card-soft border-0 shadow-sm">
+      <div class="card-body text-center py-4 py-md-5 px-4">
+        <h2 class="h5 mb-2">No bookings yet</h2>
+        <p class="mb-4">You do not have any bookings yet.</p>
+        <a href="{% url 'book_court' %}" class="btn btn-success btn-glow px-4">Book a Court</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
 {% endblock %}

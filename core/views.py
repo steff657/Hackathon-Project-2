@@ -5,6 +5,7 @@ from django.http import HttpResponseForbidden
 from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.shortcuts import render
+from django.utils import timezone
 from django.views.decorators.http import require_POST
 
 from .forms import BookingForm
@@ -108,8 +109,33 @@ def book_court(request):
 
 @login_required
 def my_bookings(request):
-    bookings = Booking.objects.filter(owner=request.user).order_by("date", "start_time")
-    return render(request, "core/my_bookings.html", {"bookings": bookings})
+    bookings = (
+        Booking.objects.filter(owner=request.user)
+        .order_by("date", "start_time")
+    )
+    today = timezone.localdate()
+    now_time = timezone.localtime().time()
+
+    past_bookings = []
+    upcoming_bookings = []
+
+    for booking in bookings:
+        is_past_booking = booking.date < today or (
+            booking.date == today and booking.start_time < now_time
+        )
+        if is_past_booking:
+            past_bookings.append(booking)
+        else:
+            upcoming_bookings.append(booking)
+
+    return render(
+        request,
+        "core/my_bookings.html",
+        {
+            "upcoming_bookings": upcoming_bookings,
+            "past_bookings": past_bookings,
+        },
+    )
 
 
 @login_required
