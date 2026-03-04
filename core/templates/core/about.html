@@ -10,9 +10,8 @@
             <h1 class="display-6 fw-bold">{{ about.title }}</h1>
             <p class="lead">{{ about.content|safe }}</p>
         </div>
-        <!-- add a 'Book Now' button that is below the content and links to the court booking page -->
         <div class="col-12 text-center mt-4">
-            <a href="{% url 'book_court' %}" class="btn btn-primary btn-lg">Book Now</a>
+            <a href="{% url 'book_court' %}" class="btn btn-accent btn-lg">Book Now</a>
         </div>
     </div>
 </section>
