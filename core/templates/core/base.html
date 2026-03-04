@@ -38,7 +38,10 @@
   <main class="container py-4 py-md-5">
     {% if messages %}
       {% for message in messages %}
-        <div class="alert {% if "error" in message.tags %}alert-danger{% elif "success" in message.tags %}alert-success{% elif "warning" in message.tags %}alert-warning{% else %}alert-info{% endif %}" role="alert">{{ message }}</div>
+        <div class="alert alert-dismissible fade show {% if "error" in message.tags %}alert-danger{% elif "success" in message.tags %}alert-success{% elif "warning" in message.tags %}alert-warning{% else %}alert-info{% endif %}" role="alert">
+          {% if "booking-reminder" in message.tags %}{{ message|safe }}{% else %}{{ message }}{% endif %}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
       {% endfor %}
     {% endif %}
     {% block content %}{% endblock %}
