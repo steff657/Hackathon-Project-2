@@ -4,17 +4,17 @@
 {% block body_class %}about-page{% endblock %}
 
 {% block content %}
-<section class="p-4 p-md-5 rounded-4">
-    <div class="row align-items-center g-4 justify-content-center">
-        <div class="col-lg-9">
-            <h1 class="display-6 fw-bold">{{ about.title }}</h1>
-            <div class="lead">
-                <p>{{ about.content|safe }}</p>
+
+<div class="row align-items-center g-4 justify-content-center">
+    <div class="col-lg-9">
+        <h1>{{ about.title }}</h1>
+        <div class="lead card-soft px-4 pb-4 pt-2">
+            <p>{{ about.content|safe }}</p>
+            <div class="text-center mt-4 ">
+                <a href="{% url 'book_court' %}" class="btn btn-accent btn-lg">Book Now</a>
             </div>
         </div>
-        <div class="col-12 text-center mt-4">
-            <a href="{% url 'book_court' %}" class="btn btn-accent btn-lg">Book Now</a>
-        </div>
     </div>
-</section>
+</div>
+
 {% endblock %}
