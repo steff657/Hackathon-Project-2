@@ -183,6 +183,7 @@ AUTHENTICATION_BACKENDS = [
 
 # Account settings
 ACCOUNT_LOGIN_REDIRECT_URL = "my_bookings"
+LOGIN_REDIRECT_URL = "my_bookings"
 ACCOUNT_LOGOUT_REDIRECT_URL = "home"
 
 ACCOUNT_LOGIN_METHODS = {"username", "email"}
