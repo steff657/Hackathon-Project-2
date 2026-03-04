@@ -7,6 +7,7 @@ from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.shortcuts import render
 from django.urls import reverse
+from django.utils.html import format_html
 from django.utils import timezone
 from django.views.decorators.http import require_POST
 
@@ -36,6 +37,30 @@ def _parse_saved_slot_payload(data):
         "start_time": parsed_start_time,
         "court_number": parsed_court_number,
     }
+
+
+def _build_booking_reminder_message(booking):
+    edit_url = reverse("edit_booking", args=[booking.id])
+    cancel_url = f"{reverse('my_bookings')}#booking-{booking.id}"
+
+    return format_html(
+        (
+            "<strong>Reminder:</strong> "
+            "You booked Court {court} on {date} at {time}. "
+            "If your plans change, update it now."
+            "<div class='mt-2'>"
+            "<a href='{edit_url}' class='btn btn-sm "
+            "btn-outline-primary me-2'>Edit booking</a>"
+            "<a href='{cancel_url}' class='btn btn-sm "
+            "btn-outline-danger'>Cancel booking</a>"
+            "</div>"
+        ),
+        court=booking.court_number,
+        date=booking.date.strftime("%d %b %Y"),
+        time=booking.start_time.strftime("%H:%M"),
+        edit_url=edit_url,
+        cancel_url=cancel_url,
+    )
 
 
 def home(request):
@@ -116,11 +141,11 @@ def book_court(request):
             booking.owner = request.user
             booking.save()
 
-            confirmation_message = (
-                f"Booking confirmed for Court {booking.court_number} on "
-                f"{booking.date:%d %b %Y} at {booking.start_time:%H:%M}."
+            messages.success(
+                request,
+                _build_booking_reminder_message(booking),
+                extra_tags="booking-reminder",
             )
-            messages.success(request, confirmation_message)
             return redirect("my_bookings")
     else:
         form = BookingForm(initial=initial_data)
@@ -146,6 +171,41 @@ def book_court(request):
             "form": form,
             "has_any_available_court": has_any_available_court,
             "saved_prefill": saved_prefill,
+            "is_edit_mode": False,
+        },
+    )
+
+
+@login_required
+def edit_booking(request, booking_id):
+    booking = get_object_or_404(Booking, pk=booking_id, owner=request.user)
+
+    if request.method == "POST":
+        form = BookingForm(request.POST, instance=booking)
+        if form.is_valid():
+            updated_booking = form.save(commit=False)
+            updated_booking.owner = request.user
+            updated_booking.save()
+
+            messages.success(
+                request,
+                _build_booking_reminder_message(updated_booking),
+                extra_tags="booking-reminder",
+            )
+            return redirect("my_bookings")
+    else:
+        form = BookingForm(instance=booking)
+
+    has_any_available_court = Court.objects.filter(is_available=True).exists()
+    return render(
+        request,
+        "core/book_court.html",
+        {
+            "form": form,
+            "has_any_available_court": has_any_available_court,
+            "saved_prefill": None,
+            "is_edit_mode": True,
+            "booking": booking,
         },
     )
 

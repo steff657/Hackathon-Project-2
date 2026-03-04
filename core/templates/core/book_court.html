@@ -1,9 +1,9 @@
 {% extends "core/base.html" %}
 
-{% block title %}Book a Court{% endblock %}
+{% block title %}{% if is_edit_mode %}Edit Booking{% else %}Book a Court{% endif %}{% endblock %}
 
 {% block content %}
-<h1 class="mb-4">Book a Court</h1>
+<h1 class="mb-4">{% if is_edit_mode %}Edit Booking{% else %}Book a Court{% endif %}</h1>
 {% if not has_any_available_court %}
   <div class="alert alert-warning">
     No courts are available right now. Please check back later.
@@ -49,8 +49,11 @@
       {% endfor %}
       <div class="col-12">
         <button type="submit" class="btn btn-accent" {% if not has_any_available_court %}disabled{% endif %}>
-          Confirm Booking
+          {% if is_edit_mode %}Update Booking{% else %}Confirm Booking{% endif %}
         </button>
+        {% if is_edit_mode %}
+          <a href="{% url 'my_bookings' %}" class="btn btn-outline-secondary ms-2">Back to My Bookings</a>
+        {% endif %}
       </div>
     </form>
   </div>
