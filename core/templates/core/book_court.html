@@ -13,6 +13,11 @@
   <div class="card-body p-4">
     <form method="post" class="row g-3">
       {% csrf_token %}
+      {% if form.non_field_errors %}
+        <div class="col-12">
+          <div class="alert alert-danger mb-1">{{ form.non_field_errors|striptags }}</div>
+        </div>
+      {% endif %}
       {% for field in form %}
         <div class="col-md-6">
           <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>

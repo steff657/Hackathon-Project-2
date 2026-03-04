@@ -139,6 +139,7 @@ class AvailabilityBookingTests(TestCase):
         self.assertContains(response, "No courts are currently available.")
 
     def test_cannot_book_unavailable_court(self):
+        self.client.force_login(self.owner)
         response = self.client.post(
             reverse("book_court"),
             {
@@ -156,6 +157,7 @@ class AvailabilityBookingTests(TestCase):
         self.assertEqual(Booking.objects.count(), 0)
 
     def test_cannot_book_court_during_maintenance_window(self):
+        self.client.force_login(self.owner)
         response = self.client.post(
             reverse("book_court"),
             {
@@ -192,9 +194,91 @@ class AvailabilityBookingTests(TestCase):
 
     def test_booking_page_shows_clear_message_if_no_courts_available(self):
         Court.objects.update(is_available=False)
+        self.client.force_login(self.owner)
         response = self.client.get(reverse("book_court"))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "No courts are available right now")
+
+
+class BookingConfirmationTests(TestCase):
+    def setUp(self):
+        user_model = get_user_model()
+        self.user = user_model.objects.create_user(
+            username="booking-user",
+            email="booking.user@example.com",
+            password="booking-pass-123",
+        )
+        self.court = Court.objects.create(
+            number=25,
+            surface=Court.Surface.HARD,
+            is_available=True,
+        )
+        self.client.force_login(self.user)
+        self.booking_payload = {
+            "player_name": "Player Confirmed",
+            "player_email": "player.confirmed@example.com",
+            "date": "2026-03-22",
+            "start_time": "09:00",
+            "duration_minutes": 60,
+            "court_number": self.court.number,
+            "notes": "Story validation booking",
+        }
+
+    def test_successful_booking_shows_single_confirmation_with_details(self):
+        response = self.client.post(
+            reverse("book_court"),
+            self.booking_payload,
+            follow=True,
+        )
+
+        self.assertRedirects(response, reverse("my_bookings"))
+        self.assertContains(
+            response,
+            "Booking confirmed for Court 25 on 22 Mar 2026 at 09:00.",
+            count=1,
+        )
+        self.assertEqual(Booking.objects.filter(owner=self.user).count(), 1)
+
+    def test_refresh_does_not_repeat_confirmation_message(self):
+        self.client.post(
+            reverse("book_court"),
+            self.booking_payload,
+            follow=True,
+        )
+        refresh_response = self.client.get(reverse("my_bookings"))
+
+        self.assertEqual(refresh_response.status_code, 200)
+        self.assertNotContains(
+            refresh_response,
+            "Booking confirmed for Court 25 on 22 Mar 2026 at 09:00.",
+        )
+
+    def test_slot_taken_shows_error_message_and_does_not_create_duplicate_booking(self):
+        Booking.objects.create(
+            player_name="Existing Player",
+            player_email="existing@example.com",
+            date=date(2026, 3, 22),
+            start_time=time(9, 0),
+            court_number=self.court.number,
+            surface=self.court.surface,
+            owner=self.user,
+        )
+
+        response = self.client.post(reverse("book_court"), self.booking_payload)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(
+            response,
+            "Booking failed: this court and time slot is already taken. Please choose another slot.",
+        )
+        self.assertEqual(
+            Booking.objects.filter(
+                date=date(2026, 3, 22),
+                start_time=time(9, 0),
+                court_number=self.court.number,
+            ).count(),
+            1,
+        )
 
 
 class CancelBookingTests(TestCase):

@@ -83,9 +83,10 @@ class BookingForm(forms.ModelForm):
     def clean(self):
         cleaned_data = super().clean()
         booking_date = cleaned_data.get("date")
+        booking_time = cleaned_data.get("start_time")
         court_number = cleaned_data.get("court_number")
 
-        if not booking_date or court_number is None:
+        if not booking_date or not booking_time or court_number is None:
             return cleaned_data
 
         try:
@@ -105,6 +106,20 @@ class BookingForm(forms.ModelForm):
             elif court.maintenance_reason:
                 reason = f"Court is unavailable: {court.maintenance_reason}"
             self.add_error("court_number", reason)
+
+        existing_slot_bookings = Booking.objects.filter(
+            date=booking_date,
+            start_time=booking_time,
+            court_number=court_number,
+        )
+        if self.instance.pk:
+            existing_slot_bookings = existing_slot_bookings.exclude(pk=self.instance.pk)
+
+        if existing_slot_bookings.exists():
+            self.add_error(
+                None,
+                "Booking failed: this court and time slot is already taken. Please choose another slot.",
+            )
 
         return cleaned_data
 

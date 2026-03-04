@@ -14,6 +14,17 @@
       {% endfor %}
     </select>
   </div>
+  <!-- Date picker  -->
+  <div class="col-sm-6 col-md-3">
+  <label for="date" class="form-label">Select date</label>
+  <input
+    type="date"
+    name="date"
+    id="date"
+    class="form-control"
+    value="{{ selected_date|date:'Y-m-d' }}"
+  >
+</div>
   <div class="col-auto">
     <button type="submit" class="btn btn-outline-secondary">Apply</button>
   </div>
@@ -26,6 +37,40 @@
           <h2 class="h5">Court {{ court.number }}</h2>
           <p class="mb-1"><strong>Surface:</strong> {{ court.get_surface_display }}</p>
           <p class="mb-0"><strong>Type:</strong> {% if court.indoors %}Indoor{% else %}Outdoor{% endif %}</p>
+
+          <hr>
+          <p class="mb-1"><strong>Availability</strong></p>
+
+          <div class="small mb-2">
+            <span class="badge bg-success">Available</span>
+            <span class="badge bg-danger">Booked</span>
+          </div>
+
+          <div class="row g-1 mt-2">
+
+            {% for slot in time_slots %}
+            <div class="col-3">
+
+              {% if court.number|stringformat:"s"|add:"-"|add:slot in booked_slots %}
+              <span class="badge bg-danger w-100 py-2">
+                {{ slot }}
+              </span>
+              
+              {% else %}
+              <a 
+              href="{% url 'book_court' %}?court_number={{ court.number }}&date={{ selected_date|date:'Y-m-d' }}&start_time={{ slot }}"
+              class="badge bg-success w-100 py-2 text-decoration-none"
+              >
+              {{ slot }}
+            </a>
+              
+              {% endif %}
+
+    </div>
+
+  {% endfor %}
+
+</div>
         </div>
       </article>
     </div>
