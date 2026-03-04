@@ -166,3 +166,12 @@ class SavedSlot(models.Model):
             f"{self.owner} saved Court {self.court_number} "
             f"on {self.date} at {self.start_time}"
         )
+
+
+class About(models.Model):
+    title = models.CharField(max_length=100, default="About Us")
+    content = models.TextField()
+    last_updated = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.title
