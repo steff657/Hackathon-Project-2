@@ -15,6 +15,7 @@
             <th>Time</th>
             <th>Court</th>
             <th>Surface</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -25,10 +26,16 @@
               <td>{{ booking.start_time|time:"H:i" }}</td>
               <td>{{ booking.court_number }}</td>
               <td>{{ booking.get_surface_display }}</td>
+              <td>
+                <form method="post" action="{% url 'cancel_booking' booking.id %}" class="d-inline">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-sm btn-outline-danger">Cancel</button>
+                </form>
+              </td>
             </tr>
           {% empty %}
             <tr>
-              <td colspan="5" class="text-center py-4">No bookings yet. Create your first one from the Book a Court page.</td>
+              <td colspan="6" class="text-center py-4">No bookings yet. Create your first one from the Book a Court page.</td>
             </tr>
           {% endfor %}
         </tbody>

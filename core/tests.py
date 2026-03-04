@@ -77,6 +77,12 @@ class CourtAdminTests(TestCase):
 
 class AvailabilityBookingTests(TestCase):
     def setUp(self):
+        user_model = get_user_model()
+        self.owner = user_model.objects.create_user(
+            username="booking-owner",
+            email="owner@example.com",
+            password="owner-pass-123",
+        )
         self.available_court = Court.objects.create(
             number=10,
             surface=Court.Surface.HARD,
@@ -145,10 +151,12 @@ class AvailabilityBookingTests(TestCase):
             start_time=time(9, 0),
             court_number=self.available_court.number,
             surface=self.available_court.surface,
+            owner=self.owner,
         )
         self.available_court.is_available = False
         self.available_court.save()
 
+        self.client.force_login(self.owner)
         response = self.client.get(reverse("my_bookings"))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Legacy Booking")
@@ -158,3 +166,71 @@ class AvailabilityBookingTests(TestCase):
         response = self.client.get(reverse("book_court"))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "No courts are available right now")
+
+
+class CancelBookingTests(TestCase):
+    def setUp(self):
+        user_model = get_user_model()
+        self.owner = user_model.objects.create_user(
+            username="owner-user",
+            email="owner.user@example.com",
+            password="owner-pass-123",
+        )
+        self.other_user = user_model.objects.create_user(
+            username="other-user",
+            email="other.user@example.com",
+            password="other-pass-123",
+        )
+        self.court = Court.objects.first()
+        self.owner_booking = Booking.objects.create(
+            player_name="Owner Player",
+            player_email="owner.user@example.com",
+            date=date(2026, 3, 20),
+            start_time=time(10, 0),
+            court_number=self.court.number,
+            surface=self.court.surface,
+            owner=self.owner,
+        )
+        self.other_booking = Booking.objects.create(
+            player_name="Other Player",
+            player_email="other.user@example.com",
+            date=date(2026, 3, 21),
+            start_time=time(11, 0),
+            court_number=self.court.number,
+            surface=self.court.surface,
+            owner=self.other_user,
+        )
+
+    def test_logged_in_user_only_sees_own_bookings(self):
+        self.client.force_login(self.owner)
+        response = self.client.get(reverse("my_bookings"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Owner Player")
+        self.assertNotContains(response, "Other Player")
+        self.assertContains(response, "Cancel")
+
+    def test_owner_can_cancel_booking(self):
+        self.client.force_login(self.owner)
+        response = self.client.post(
+            reverse("cancel_booking", args=[self.owner_booking.pk]),
+            follow=True,
+        )
+
+        self.assertRedirects(response, reverse("my_bookings"))
+        self.assertFalse(Booking.objects.filter(pk=self.owner_booking.pk).exists())
+        self.assertContains(response, "Booking cancelled successfully.")
+
+    def test_user_cannot_cancel_another_users_booking(self):
+        self.client.force_login(self.owner)
+        response = self.client.post(reverse("cancel_booking", args=[self.other_booking.pk]))
+
+        self.assertEqual(response.status_code, 403)
+        self.assertTrue(Booking.objects.filter(pk=self.other_booking.pk).exists())
+
+    def test_manual_url_get_cannot_delete_another_users_booking(self):
+        self.client.force_login(self.owner)
+        response = self.client.get(reverse("cancel_booking", args=[self.other_booking.pk]))
+
+        self.assertEqual(response.status_code, 405)
+        self.assertTrue(Booking.objects.filter(pk=self.other_booking.pk).exists())
