@@ -18,7 +18,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 
 from .forms import BookingForm, ContactRequestForm
-from .models import Booking, Court, SavedSlot
+from .models import Booking, Court, SavedSlot, About
 
 
 def _create_checkout_session(request, booking):
@@ -588,3 +588,11 @@ def stripe_webhook(request):
                 )
 
     return HttpResponse(status=200)
+
+
+def about(request):
+    about_info = About.objects.first()
+    context = {
+        "about": about_info,
+    }
+    return render(request, "core/about.html", context)
