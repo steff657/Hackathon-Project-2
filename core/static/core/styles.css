@@ -4,41 +4,155 @@
   --accent: #2f9e44;
   --accent-dark: #247a35;
   --surface: #ffffff;
+  --glass-bg: #ffffff;
+  --glass-blur: blur(4px);
+  --glow-tint: #dfff75;
+  --glow-border: color-mix(in srgb, var(--accent) 72%, var(--glow-tint) 28%);
+  --glow-ring: 0 0 0 2px
+    color-mix(in srgb, var(--accent) 58%, var(--glow-tint) 42%);
+  --glow-aura-color: color-mix(
+    in srgb,
+    var(--accent) 52%,
+    var(--glow-tint) 48%
+  );
 }
 
 body {
-  background: radial-gradient(circle at top right, #d5ece0, var(--bg) 40%);
+  background-color: var(--bg);
   color: var(--ink);
 }
 
-.top-nav {
-  background-color: #ffffffcc;
+body.home-page {
+  background:
+    linear-gradient(rgba(16, 34, 29, 0.24), rgba(16, 34, 29, 0.24)),
+    url("images/tennis_court.png") center/cover no-repeat;
+  background-attachment: fixed;
+}
+/* Navigation Bar */
+.top-nav,
+.footer {
+  background-color: var(--glass-bg);
+  backdrop-filter: none;
+}
+
+.navbar-brand .logo {
+  height: 60px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+}
+
+/* Hero Section */
+.hero {
+  background-color: rgba(23, 53, 45, 0.38);
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(5px);
+}
+
+.hero-image-wrap {
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.28);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  --hover-shadow: 0 14px 34px rgba(0, 0, 0, 0.32);
+  --hover-aura-size: 30px;
+}
+
+.hero-image {
+  width: 100%;
+  height: 100%;
+  max-height: 340px;
+  object-fit: cover;
+  display: block;
+}
+
+/*Footer*/
+.footer {
+  border-top: 1px solid #e5e5e5;
+  font-size: 0.9rem;
+}
+
+.social-icons a {
+  color: var(--ink);
+  font-size: 2rem;
+  transition: color 0.3s ease;
+}
+
+.social-icons a:hover {
+  color: var(--accent-dark);
+  transform: translateY(-2px) scale(1.1);
+}
+
+/* Cards */
+.card-soft {
+  background-color: rgba(255, 255, 255, 0.5);
+  border: 1px solid #d8e2dd;
+  border-radius: 1rem;
   backdrop-filter: blur(4px);
 }
 
-.hero {
-  background: linear-gradient(120deg, #17352d, #225945);
-  color: #fff;
+.home-cards .card-soft {
+  --hover-shadow: 0 12px 28px rgba(0, 0, 0, 0.2);
+  --hover-aura-size: 24px;
 }
 
-.card-soft {
-  background-color: var(--surface);
-  border: 1px solid #d8e2dd;
-  border-radius: 1rem;
+.hero-image-wrap,
+.home-cards .card-soft {
+  transition:
+    box-shadow 0.25s ease,
+    transform 0.25s ease,
+    border-color 0.25s ease;
 }
 
+.hero-image-wrap:hover,
+.home-cards .card-soft:hover {
+  border-color: var(--glow-border);
+  box-shadow:
+    var(--hover-shadow),
+    var(--glow-ring),
+    0 0 var(--hover-aura-size) var(--glow-aura-color);
+  transform: translateY(-2px);
+}
+
+/* Buttons */
 .btn-accent {
   background-color: var(--accent);
   color: #fff;
   border: 1px solid var(--accent);
 }
 
+.btn-accent,
+.hero .btn-outline-light {
+  transition:
+    box-shadow 0.25s ease,
+    transform 0.25s ease,
+    border-color 0.25s ease,
+    background-color 0.25s ease,
+    color 0.25s ease;
+}
+
 .btn-accent:hover {
   background-color: var(--accent-dark);
   color: #fff;
-  border-color: var(--accent-dark);
+  border-color: var(--glow-border);
+  box-shadow:
+    var(--glow-ring),
+    0 0 20px var(--glow-aura-color);
+  transform: translateY(-1px);
 }
 
+.hero .btn-outline-light:hover {
+  border-color: var(--glow-border);
+  box-shadow:
+    var(--glow-ring),
+    0 0 20px var(--glow-aura-color);
+  transform: translateY(-1px);
+}
+
+/* Forms */
 input,
 select,
 textarea {
@@ -46,4 +160,11 @@ textarea {
   border: 1px solid #c8d3cd;
   border-radius: 0.5rem;
   padding: 0.5rem 0.65rem;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 991.98px) {
+  body.home-page {
+    background-attachment: scroll;
+  }
 }

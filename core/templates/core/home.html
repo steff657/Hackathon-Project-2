@@ -1,18 +1,23 @@
 {% extends "core/base.html" %}
 
 {% block title %}Home{% endblock %}
+{% block body_class %}home-page{% endblock %}
 
 {% block content %}
 <section class="hero p-4 p-md-5 rounded-4">
-  <h1 class="display-5 fw-bold">Book Your Tennis Court in Minutes</h1>
-  <p class="lead">Welcome to the most beautiful tennis courts in the world.</p>
-  <div class="d-flex flex-wrap gap-3 mt-4">
-    <a href="{% url 'book_court' %}" class="btn btn-accent btn-lg">Book Now</a>
-    <a href="{% url 'courts' %}" class="btn btn-outline-light btn-lg">View Courts</a>
+  <div class="row align-items-center g-4 justify-content-center">
+    <div class="col-lg-9">
+      <h1 class="display-6 fw-bold">Book Your Tennis Court in Minutes</h1>
+      <p class="lead">Welcome to the most beautiful tennis courts in the world.</p>
+      <div class="d-flex flex-wrap gap-3 mt-4">
+        <a href="{% url 'book_court' %}" class="btn btn-accent btn-lg">Book Now</a>
+        <a href="{% url 'courts' %}" class="btn btn-outline-light btn-lg">View Courts</a>
+      </div>
+    </div>
   </div>
 </section>
 
-<section class="row g-3 mt-4">
+<section class="row g-3 mt-4 home-cards">
   <div class="col-md-6">
     <div class="card card-soft h-100">
       <div class="card-body">
