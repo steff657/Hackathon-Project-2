@@ -49,7 +49,7 @@
       {% endfor %}
       <div class="col-12">
         <button type="submit" class="btn btn-accent" {% if not has_any_available_court %}disabled{% endif %}>
-          {% if is_edit_mode %}Update Booking{% else %}Confirm Booking{% endif %}
+          {% if is_edit_mode %}Update Booking{% else %}Continue to Payment{% endif %}
         </button>
         {% if is_edit_mode %}
           <a href="{% url 'my_bookings' %}" class="btn btn-outline-secondary ms-2">Back to My Bookings</a>

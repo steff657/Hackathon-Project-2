@@ -66,6 +66,7 @@
             <th>Time</th>
             <th>Court</th>
             <th>Surface</th>
+            <th>Payment</th>
             <th>Status</th>
             <th>Actions</th>
           </tr>
@@ -78,8 +79,23 @@
               <td>{{ booking.start_time|time:"H:i" }}</td>
               <td>{{ booking.court_number }}</td>
               <td>{{ booking.get_surface_display }}</td>
+              <td>
+                {% if booking.payment_status == "paid" %}
+                  <span class="badge text-bg-primary">Paid</span>
+                {% elif booking.payment_status == "pending" %}
+                  <span class="badge text-bg-warning">Pending payment</span>
+                {% else %}
+                  <span class="badge text-bg-secondary">{{ booking.get_payment_status_display }}</span>
+                {% endif %}
+              </td>
               <td><span class="badge text-bg-success">Upcoming</span></td>
               <td>
+                {% if booking.payment_status != "paid" %}
+                  <form method="post" action="{% url 'pay_booking' booking.id %}" class="d-inline me-1">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-outline-success">Pay now</button>
+                  </form>
+                {% endif %}
                 <a href="{% url 'edit_booking' booking.id %}" class="btn btn-sm btn-outline-primary me-1">Edit</a>
                 <form method="post" action="{% url 'cancel_booking' booking.id %}" class="d-inline me-1">
                   {% csrf_token %}
@@ -105,7 +121,7 @@
             </tr>
           {% empty %}
             <tr>
-              <td colspan="7" class="text-center py-4">No upcoming bookings.</td>
+              <td colspan="8" class="text-center py-4">No upcoming bookings.</td>
             </tr>
           {% endfor %}
         </tbody>
@@ -126,6 +142,7 @@
             <th>Time</th>
             <th>Court</th>
             <th>Surface</th>
+            <th>Payment</th>
             <th>Status</th>
             <th>Actions</th>
           </tr>
@@ -138,8 +155,23 @@
               <td>{{ booking.start_time|time:"H:i" }}</td>
               <td>{{ booking.court_number }}</td>
               <td>{{ booking.get_surface_display }}</td>
+              <td>
+                {% if booking.payment_status == "paid" %}
+                  <span class="badge text-bg-primary">Paid</span>
+                {% elif booking.payment_status == "pending" %}
+                  <span class="badge text-bg-warning">Pending payment</span>
+                {% else %}
+                  <span class="badge text-bg-secondary">{{ booking.get_payment_status_display }}</span>
+                {% endif %}
+              </td>
               <td><span class="badge text-bg-secondary">Past</span></td>
               <td>
+                {% if booking.payment_status != "paid" %}
+                  <form method="post" action="{% url 'pay_booking' booking.id %}" class="d-inline me-1">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-outline-success">Pay now</button>
+                  </form>
+                {% endif %}
                 {% if booking.is_saved_slot %}
                   <form method="post" action="{% url 'unsave_slot' booking.saved_slot_id %}" class="d-inline me-1">
                     {% csrf_token %}
@@ -166,7 +198,7 @@
             </tr>
           {% empty %}
             <tr>
-              <td colspan="7" class="text-center py-4">No past bookings yet.</td>
+              <td colspan="8" class="text-center py-4">No past bookings yet.</td>
             </tr>
           {% endfor %}
         </tbody>

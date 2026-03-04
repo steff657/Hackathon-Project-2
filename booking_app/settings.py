@@ -37,6 +37,7 @@ def _get_bool(name: str, default: bool = False) -> bool:
     return os.getenv(name, str(default)).strip().lower() in {"1", "true", "yes", "on"}
 
 
+_load_dotenv(BASE_DIR.parent / ".env")
 _load_dotenv(BASE_DIR / ".env")
 
 
@@ -202,3 +203,10 @@ ACCOUNT_FORMS = {
     "signup": "core.forms.CustomSignupForm",
     "login": "core.forms.CustomLoginForm",
 }
+
+# Stripe settings
+STRIPE_PUBLIC_KEY = os.getenv("STRIPE_PUBLIC_KEY", "")
+STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY", "")
+STRIPE_WEBHOOK_SECRET = os.getenv("STRIPE_WEBHOOK_SECRET", "")
+STRIPE_CURRENCY = os.getenv("STRIPE_CURRENCY", "gbp")
+STRIPE_BOOKING_PRICE_PENCE = int(os.getenv("STRIPE_BOOKING_PRICE_PENCE", "1000"))

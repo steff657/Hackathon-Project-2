@@ -1,0 +1,18 @@
+{% extends "core/base.html" %}
+
+{% block title %}Payment Cancelled{% endblock %}
+
+{% block content %}
+<div class="card card-soft">
+  <div class="card-body p-4">
+    <h1 class="h3 mb-3">Payment cancelled</h1>
+    <p>
+      Your booking remains pending and has not been marked as paid.
+      {% if booking %}
+        You can return to My Bookings and click <strong>Pay now</strong> anytime.
+      {% endif %}
+    </p>
+    <a href="{% url 'my_bookings' %}" class="btn btn-accent">Back to My Bookings</a>
+  </div>
+</div>
+{% endblock %}
