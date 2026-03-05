@@ -1,6 +1,7 @@
 from django import forms
 from django.core.exceptions import ValidationError
 from allauth.account.forms import LoginForm, SignupForm
+from datetime import datetime, timedelta
 
 from .models import Booking, ContactRequest, Court
 
@@ -37,6 +38,20 @@ class BookingForm(forms.ModelForm):
             (court.number, f"Court {court.number} ({court.get_surface_display()})")
             for court in available_courts
         ]
+        # Set time picker restrictions based on selected court
+        if self.data.get("court_number"):
+            try:
+                court_number = int(self.data.get("court_number"))
+                court = Court.objects.filter(number=court_number).first()
+                if court:
+                    self.fields["start_time"].widget.attrs.update({
+                        "min": court.opening_time.strftime("%H:%M"),
+                        "max": court.closing_time.strftime("%H:%M"),
+                        "step": "3600",  # 1 hour intervals
+                    })
+            except (ValueError, TypeError):
+                pass
+
         posted_court = self.data.get("court_number") if self.is_bound else None
         if posted_court:
             try:
@@ -106,6 +121,23 @@ class BookingForm(forms.ModelForm):
             elif court.maintenance_reason:
                 reason = f"Court is unavailable: {court.maintenance_reason}"
             self.add_error("court_number", reason)
+
+        # Check if booking is within court opening hours
+        start_datetime = datetime.combine(booking_date, booking_time)
+        duration = cleaned_data.get("duration_minutes", 60)
+        end_datetime = start_datetime + timedelta(minutes=duration)
+
+        if booking_time < court.opening_time:
+            self.add_error(
+                "start_time",
+                f"Court opens at {court.opening_time.strftime('%H:%M')}. Please select a later time."
+            )
+
+        if end_datetime.time() > court.closing_time:
+            self.add_error(
+                "start_time",
+                f"Court closes at {court.closing_time.strftime('%H:%M')}. This booking would end too late."
+            )
 
         existing_slot_bookings = Booking.objects.filter(
             date=booking_date,

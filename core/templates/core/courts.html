@@ -10,21 +10,15 @@
     <select name="surface" id="surface" class="form-select" onchange="this.form.submit()">
       <option value="">All surfaces</option>
       {% for value, label in surface_choices %}
-        <option value="{{ value }}" {% if selected_surface == value %}selected{% endif %}>{{ label }}</option>
+      <option value="{{ value }}" {%if selected_surface == value %}selected{%endif%}>{{ label }}</option>
       {% endfor %}
     </select>
   </div>
   <!-- Date picker  -->
   <div class="col-sm-6 col-md-3">
-  <label for="date" class="form-label">Select date</label>
-  <input
-    type="date"
-    name="date"
-    id="date"
-    class="form-control"
-    value="{{ selected_date|date:'Y-m-d' }}"
-  >
-</div>
+    <label for="date" class="form-label">Select date</label>
+    <input type="date" name="date" id="date" class="form-control" value="{{ selected_date|date:'Y-m-d' }}">
+  </div>
   <div class="col-auto">
     <button type="submit" class="btn btn-outline-secondary">Apply</button>
   </div>
@@ -32,11 +26,13 @@
 <div class="accordion mb-4" id="pricingPolicyAccordion">
   <div class="accordion-item">
     <h2 class="accordion-header" id="pricingPolicyHeading">
-      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#pricingPolicyCollapse" aria-expanded="false" aria-controls="pricingPolicyCollapse">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+        data-bs-target="#pricingPolicyCollapse" aria-expanded="false" aria-controls="pricingPolicyCollapse">
         Peak and Off-peak Pricing Policy
       </button>
     </h2>
-    <div id="pricingPolicyCollapse" class="accordion-collapse collapse" aria-labelledby="pricingPolicyHeading" data-bs-parent="#pricingPolicyAccordion">
+    <div id="pricingPolicyCollapse" class="accordion-collapse collapse" aria-labelledby="pricingPolicyHeading"
+      data-bs-parent="#pricingPolicyAccordion">
       <div class="accordion-body">
         Off-peak slots (09:00-16:00) are {{ off_peak_price_display }} per booking.
         Peak slots (17:00-20:00) are {{ peak_price_display }} per booking.
@@ -46,59 +42,58 @@
 </div>
 <div class="row g-3 courts-grid">
   {% for court in courts %}
-    <div class="col-sm-6 col-lg-3">
-      <article class="card card-soft h-100">
-        <div class="card-body">
-          <h2 class="h5">Court {{ court.number }}</h2>
-          <p class="mb-1"><strong>Surface:</strong> {{ court.get_surface_display }}</p>
-          <p class="mb-0"><strong>Type:</strong> {% if court.indoors %}Indoor{% else %}Outdoor{% endif %}</p>
+  <div class="col-sm-6 col-lg-3">
+    <article class="card card-soft h-100">
+      <div class="card-body">
+        <h2 class="h5">Court {{ court.number }}</h2>
+        <p class="mb-1"><strong>Surface:</strong> {{ court.get_surface_display }}</p>
+        <p class="mb-0"><strong>Type:</strong> {% if court.indoors %}Indoor{% else %}Outdoor{% endif %}</p>
 
-          <hr>
-          <p class="mb-1"><strong>Availability</strong></p>
+        <hr>
+        <p class="mb-1"><strong>Availability</strong></p>
 
-          <div class="small mb-2">
-            <span class="badge bg-success">Available</span>
-            <span class="badge bg-danger">Booked</span>
-            <span class="badge price-legend-offpeak ms-1">Off-peak</span>
-            <span class="badge price-legend-peak ms-1">Peak</span>
+        <div class="small mb-2">
+          <span class="badge bg-success">Available</span>
+          <span class="badge bg-danger">Booked</span>
+          <span class="badge price-legend-offpeak ms-1">Off-peak</span>
+          <span class="badge price-legend-peak ms-1">Peak</span>
+        </div>
+
+        <div class="row g-1 mt-2">
+
+          {% for slot in time_slots %}
+          <div class="col-3">
+            {% with slot_key=court.number|stringformat:"s"|add:"-"|add:slot.value %}
+            {% if slot_key in booked_slots %}
+            <span class="badge bg-danger w-100 py-2 slot-badge">
+              <span>{{ slot.value }}</span>
+              <span class="small d-block">{{ slot.price_display }}</span>
+              <span class="small d-block">{{ slot.label }}</span>
+            </span>
+
+            {% else %}
+            <a href="{% url 'book_court' %}?court_number={{ court.number }}&date={{ selected_date|date:'Y-m-d' }}&start_time={{ slot.value }}"
+              class="badge w-100 py-2 text-decoration-none slot-badge {% if slot.is_peak %}slot-badge-peak{% else %}slot-badge-offpeak{% endif %}">
+              <span>{{ slot.value }}</span>
+              <span class="small d-block">{{ slot.price_display }}</span>
+              <span class="small d-block">{{ slot.label }}</span>
+            </a>
+
+            {% endif %}
+            {% endwith %}
+
           </div>
 
-          <div class="row g-1 mt-2">
+          {% endfor %}
 
-            {% for slot in time_slots %}
-            <div class="col-3">
-
-              {% if court.number|stringformat:"s"|add:"-"|add:slot.value in booked_slots %}
-              <span class="badge bg-danger w-100 py-2 slot-badge">
-                <span>{{ slot.value }}</span>
-                <span class="small d-block">{{ slot.price_display }}</span>
-                <span class="small d-block">{{ slot.label }}</span>
-              </span>
-              
-              {% else %}
-              <a 
-              href="{% url 'book_court' %}?court_number={{ court.number }}&date={{ selected_date|date:'Y-m-d' }}&start_time={{ slot.value }}"
-              class="badge w-100 py-2 text-decoration-none slot-badge {% if slot.is_peak %}slot-badge-peak{% else %}slot-badge-offpeak{% endif %}"
-              >
-                <span>{{ slot.value }}</span>
-                <span class="small d-block">{{ slot.price_display }}</span>
-                <span class="small d-block">{{ slot.label }}</span>
-            </a>
-              
-              {% endif %}
-
-    </div>
-
-  {% endfor %}
-
-</div>
         </div>
-      </article>
-    </div>
+      </div>
+    </article>
+  </div>
   {% empty %}
-    <div class="col-12">
-      <div class="alert alert-warning mb-0">No courts are currently available.</div>
-    </div>
+  <div class="col-12">
+    <div class="alert alert-warning mb-0">No courts are currently available.</div>
+  </div>
   {% endfor %}
 </div>
 {% endblock %}

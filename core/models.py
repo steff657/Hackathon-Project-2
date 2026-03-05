@@ -16,6 +16,8 @@ class Court(models.Model):
         default=Surface.HARD,
     )
     indoors = models.BooleanField(default=False)
+    opening_time = models.TimeField(default="09:00")
+    closing_time = models.TimeField(default="17:00")
     is_available = models.BooleanField(default=True)
     maintenance_start = models.DateField(blank=True, null=True)
     maintenance_end = models.DateField(blank=True, null=True)
