@@ -196,7 +196,7 @@ The application uses CSS variables defined in the `:root` selector to maintain a
 
 The database schema for SetPoint is shown below, including the main models and their relationships.
 
-![ERD image](read-me-images/ERD.png)
+![](assets/20260305_142152_ERD.webp)
 
 SetPoint uses a relational database structure centred around bookings:
 
