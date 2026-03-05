@@ -12,10 +12,10 @@ SetPoint is a full-stack Django web application that allows users to book tennis
 
 ## Table Of Contents:
 
-1. [Contributors](#contributors)
-2. [Overview](#overview)
-3. [Key Features](#key-features)
-4. [Tech Stack](#tech-stack)
+1. [Repository Links](#repository-links)
+2. [Contributors](#contributors)
+3. [Overview](#overview)
+4. [Key Features](#key-features)
 5. [Design & Planning](#design--planning)
 
 - [User Stories](#user-stories)
@@ -73,16 +73,6 @@ The app supports the full booking lifecycle:
 - **Support contact form** linked to optional booking context
 - **Admin tools** for booking management and refund handling
 
-## Tech Stack
-
-- Python 3.12
-- Django 6
-- django-allauth (authentication)
-- Stripe (payments/webhooks)
-- Bootstrap 5
-- HTML/CSS
-- SQLite (dev) / configurable database for deployment
-
 ## Design & Planning:
 
 ### User Stories
@@ -112,17 +102,95 @@ For detailed User Stories, including acceptance criteria and task breakdowns, pl
 
 ### Wireframes
 
+The following wireframes were created for desktop and mobile views:
+
+#### Home Page
+
+- Desktop:
+
+  ![Home Desktop Wireframe](wireframes/home_desktop.png)
+
+- Mobile:
+
+  ![Home Mobile Wireframe](wireframes/home_mobile.png)
+
+#### Courts Page
+
+- Desktop:
+
+  ![Courts Desktop Wireframe](wireframes/courts_desktop.png)
+
+- Mobile:
+
+  ![Courts Mobile Wireframe](wireframes/courts_mobile.png)
+
+#### Book Court Page
+
+- Desktop:
+
+  ![Book Court Desktop Wireframe](wireframes/book_desktop.png)
+
+- Mobile:
+
+  ![Book Court Mobile Wireframe](wireframes/book_mobile.png)
+
+#### My Bookings Page
+
+- Desktop:
+
+  ![My Bookings Desktop Wireframe](wireframes/my_bookings_desktop.png)
+
+- Mobile:
+
+  ![My Bookings Mobile Wireframe](wireframes/my_bookings_mobile.png)
+
 ### Agile Methodology
 
-Explain your agile approach to your project and insert screenshots of your Kanban board (iterations, user stories, tasks, acceptance criteria, labels, story points).
+The SetPoint project was developed using an Agile methodology, supported by a GitHub Kanban board to manage tasks, user stories, and overall development progress.
+
+**The workflow was organised using the following columns:**
+
+Backlog (This item hasn't been started)
+Ready (This is ready to be picked up)
+In Progress (This is actively being worked on)
+In Review (This item is in review)
+Done ( THis has been completed)
+Future Features ( planned for future development)
+
+User stories were prioritised using the MoSCoW method (Must Have, Should Have, Could Have) to ensure that essential booking functionality was implemented first while allowing room for additional improvements if time permitted.
+
+**Development was structured into the following sprints:**
+
+**Sprint 1** – Foundation
+Project setup, Django configuration, base templates, navigation, and authentication with django-allauth. Core Court and Booking models were created and a basic availability view implemented. The project was deployed to Heroku early to identify potential deployment issues.
+
+**Sprint 2** – MVP Booking Flow
+Implementation of the core booking system. Users can book courts, view available time slots, receive confirmations, and manage their bookings. Validation prevents double bookings and ensures only the booking owner can cancel.
+
+**Sprint 3** – Admin & Demo Preparation
+Admin tools were added to manage bookings and court availability. An About page was implemented and made editable via admin, along with UI improvements for the demo.
+
+**Sprint 4** – Testing & Enhancements
+Final testing, bug fixing, and validation improvements were completed. Additional stretch features were explored where possible.
 
 ### Typography
 
-Explain the font you've used for your project.
+This project uses Bootstrap’s default typography, which relies on a system sans-serif font stack (for example Segoe UI, Roboto, and Arial, depending on the user’s device). No custom font was added, to keep the design clean, fast-loading, and consistent across browsers.
 
 ### Colour Scheme
 
-Screenshot of the colour scheme for your project.
+The colour palette for SetPoint was designed to reflect a clean, modern sports theme inspired by tennis courts and outdoor environments. Green tones represent the tennis court surface, while soft neutrals and glass effects create a light and accessible interface.
+
+The application uses CSS variables defined in the `:root` selector to maintain a consistent design system across the interface:
+
+| Colour Name       | Colour Code | Preview                                                   |
+| ----------------- | ----------- | --------------------------------------------------------- |
+| Background        | `#eef2f2`   | ![#eef2f2](https://singlecolorimage.com/get/eef2f2/15x15) |
+| Text (Ink)        | `#13231f`   | ![#13231f](https://singlecolorimage.com/get/13231f/15x15) |
+| Accent Green      | `#2f9e44`   | ![#2f9e44](https://singlecolorimage.com/get/2f9e44/15x15) |
+| Accent Dark Green | `#247a35`   | ![#247a35](https://singlecolorimage.com/get/247a35/15x15) |
+| Surface (White)   | `#ffffff`   | ![#ffffff](https://singlecolorimage.com/get/ffffff/15x15) |
+| Glow Highlight    | `#dfff75`   | ![#dfff75](https://singlecolorimage.com/get/dfff75/15x15) |
 
 ### Database Diagram
 
@@ -146,20 +214,59 @@ Explain your features on the website (navigation, pages, links, forms, input fie
 
 ## Technologies Used
 
-List of technologies used for your project.
+### Core Technologies
 
-Current stack:
+- **Python 3.12** – main backend programming language
+- **Django 6.0.2** – web framework used to build the application
+- **HTML5** – structure of the website
+- **CSS3** – custom styling and layout
+- **Bootstrap 5** – responsive design framework
 
-- Python 3.12
-- Django 6.0.2
-- django-allauth 65.14.3
-- HTML5
-- CSS3
-- Bootstrap 5
+### Django Libraries
+
+- **django-allauth** – authentication system (signup, login, logout)
+- **django-summernote** – rich text editor for admin content management
+
+### Payment Integration
+
+- **Stripe** – secure payment processing for bookings
+
+### Database
+
+- **PostgreSQL** – production database used with Heroku
+- **psycopg2-binary** – PostgreSQL adapter for Python
+
+### Deployment & Hosting
+
+- **Heroku** – cloud platform used for deployment
+- **Gunicorn** – WSGI HTTP server used in production
+- **WhiteNoise** – static file serving for Django
+
+### Additional Packages
+
+- **dj-database-url** – database configuration via environment variables
+- **Requests** – HTTP requests library
+
+### Version Control
+
+- **Git**
+- **GitHub**
 
 ## Libraries Used
 
-List all libraries/packages used for your project.
+The following libraries and packages were used to support development, deployment, and functionality within the project:
+
+- **Django** – Core web framework used to build the application.
+- **django-allauth** – User authentication, registration, login, and logout.
+- **django-summernote** – Rich text editor support for admin-managed content.
+- **stripe** – Stripe API integration for secure booking payments.
+- **dj-database-url** – Database configuration via environment variables.
+- **psycopg2-binary** – PostgreSQL database adapter for Python.
+- **gunicorn** – Production WSGI server for Heroku deployment.
+- **whitenoise** – Static file serving in production.
+- **requests** – HTTP client library for external requests.
+- **bleach** – HTML sanitisation support (used with rich text content).
+- **asgiref**, **sqlparse**, **tzdata**, **typing_extensions**, **packaging**, **certifi**, **charset-normalizer**, **idna**, **urllib3**, **webencodings** – Supporting dependencies required by the primary libraries.
 
 ## Testing
 
@@ -207,48 +314,81 @@ List bugs and how you fixed them.
 
 ## Deployment
 
-This website is deployed to Heroku from a GitHub repository, the following steps were taken:
+This project is deployed on Heroku from the GitHub repository.
 
-#### Creating Repository on GitHub
+### 1. Prepare the project
 
-- First make sure you are signed into [GitHub](https://github.com/) and go to the Code Institute template, which can be found [here](https://github.com/Code-Institute-Org/gitpod-full-template).
-- Then click on **Use this template** and select **Create a new repository** from the drop-down. Enter the name for the repository and click **Create repository from template**.
-- Once the repository was created, click the green **Gitpod** button to create a workspace in Gitpod so that you can write the code for the site.
+Make sure the following files are present in the root of the project:
 
-#### Creating an app on Heroku
+- `requirements.txt`
+- `Procfile` (web process for Gunicorn)
+- `runtime.txt` (Python version)
 
-- After creating the repository on GitHub, head over to [Heroku](https://www.heroku.com/) and sign in.
-- On the home page, click **New** and **Create new app** from the drop-down.
-- Give the app a name (this must be unique) and select a **region**. Then click **Create app**.
+Generate or update dependencies before deploying:
 
-#### Create a database
+```bash
+pip freeze > requirements.txt
+```
 
-- Log into [CI Database Maker](https://dbs.ci-dbs.net/).
-- Add your email address in the input field and submit the form.
-- Open the database link in your email.
-- Paste the database URL in your `DATABASE_URL` variable in `env.py` and in Heroku config vars.
+### 2. Create the GitHub repository
 
-#### Deploying to Heroku
+- Sign in to [GitHub](https://github.com/).
+- Create a new repository (or use the Code Institute template if required).
+- Push your project code to the `main` branch.
 
-- Head back over to [Heroku](https://www.heroku.com/) and click on your **app** then go to the **Settings** tab.
-- On the **Settings** page, scroll down to the **Config Vars** section and enter:
-  - `DATABASE_URL`
-  - `SECRET_KEY`
-  - `CLOUDINARY_URL`
-  - `PORT` set to `8000`
-- Then scroll to the top and go to the **Deploy** tab.
-- In **Deployment method**, select **GitHub** and sign into your account.
-- In **Search for a repository to connect to**, enter your repository name and click **Connect**.
-- In **Manual Deploy**, click **Deploy Branch**. Once deployed, click **View app**.
-- Note: when deploying manually, you will need to deploy after each change.
+### 3. Create a Heroku app
 
-## AI
+- Sign in to [Heroku](https://www.heroku.com/).
+- Click **New** → **Create new app**.
+- Enter a unique app name and select your region.
+- Click **Create app**.
 
-- Explain the usage of AI in your project (features, bugs, etc.).
+### 4. Provision a database
 
-## Credits
+- Create a PostgreSQL database (for example via [CI Database Maker](https://dbs.ci-dbs.net/) or Heroku Postgres).
+- Copy the database URL.
 
-List resources used for your website (text, images, code snippets, projects).
+### 5. Configure environment variables
+
+In Heroku, open **Settings** → **Config Vars** and add:
+
+- `DATABASE_URL`
+- `SECRET_KEY`
+- `STRIPE_PUBLIC_KEY`
+- `STRIPE_SECRET_KEY`
+- `STRIPE_WEBHOOK_SECRET` (if using webhooks)
+- `CLOUDINARY_URL` (if media storage is configured)
+- `DISABLE_COLLECTSTATIC` (optional, only for troubleshooting static collection)
+
+### 6. Connect Heroku to GitHub and deploy
+
+- Open the **Deploy** tab in Heroku.
+- In **Deployment method**, select **GitHub**.
+- Connect your repository.
+- Choose either:
+  - **Automatic Deploys** from `main`, or
+  - **Manual Deploy** → **Deploy Branch**.
+
+### 7. Post-deployment checks
+
+After deployment:
+
+- Open the app URL and verify pages load correctly.
+- Run migrations from Heroku if needed:
+
+```bash
+heroku run python manage.py migrate -a <your-app-name>
+```
+
+- Optionally create a superuser:
+
+```bash
+heroku run python manage.py createsuperuser -a <your-app-name>
+```
+
+### 8. Local environment setup (for development)
+
+Use an `env.py` file locally (not committed to Git) for sensitive keys, and ensure the same variables are set in Heroku Config Vars for production.
 
 ### Project Structure
 
@@ -275,8 +415,35 @@ docs/
 
 Open: `http://127.0.0.1:8000/`
 
+## AI
+
+AI tools were used throughout the project as a support assistant during development and documentation.
+
+Key areas where AI was used:
+
+- **User story ideation**: to brainstorm and refine user stories before adding them to the project board.
+- **Bug fixing support**: to help diagnose errors, suggest likely causes, and propose fix approaches.
+- **README enhancements**: to improve wording, structure, and clarity across documentation sections.
+- **General development support**: to review implementation ideas and speed up routine writing tasks.
+
+All AI-generated suggestions were reviewed, edited, and validated by the development team before being applied.
+
+## Credits
+
 ### Acknowledgments
 
 - Django documentation
+- Django Allauth documentation
 - Bootstrap documentation
+- jsDelivr CDN (Bootstrap CSS/JS delivery)
+- Font Awesome (social and UI icons)
+- Stripe and Stripe documentation (payment integration)
+- Heroku (deployment platform)
+- CI Database Maker (PostgreSQL provisioning)
+- Lucidchart (database diagrams)
+- Balsamiq (wireframes)
+- GitHub Copilot (development assistance)
+- ChatGPT (ideation, debugging support, and documentation wording)
+- Tinyfy (image optimisation/compression)
+- Discord (communication between team members)
 - Team contributors and reviewers
