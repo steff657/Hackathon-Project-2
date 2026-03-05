@@ -319,25 +319,57 @@ Screenshot of validation results:
 
 ![HTML validation](testing/html_validation.png)
 
-### Manual Testing user stories
+### Feature Manual Testing
 
-Test all your user stories. You can create a table:
+| Feature | How to Test | Expected Result | Result |
+| --- | --- | --- | :---: |
+| User Registration | Navigate to Sign Up, enter email, username, and password, then submit. | Account is created and user can log in. | Pass |
+| User Login/Logout | Log in with valid credentials; verify access to My Bookings; then log out. | User session is authenticated when logged in; redirected after logout. | Pass |
+| Court Listing & Filtering | Open Courts page; filter by surface type and/or date. | Courts display with correct surface filters applied; unavailable courts hidden. | Pass |
+| View Court Availability | Open Courts or Book Court page and check available time slots. | Available slots are shown; booked/unavailable slots are not selectable. | Pass |
+| Create Booking | Select a court, date, and time, then submit the booking form. | Booking is created and appears in My Bookings with Pending payment status. | Pass |
+| Edit Own Booking | From My Bookings, click Edit on own booking and change date/time. | Changes are saved; no overbooking or conflict occurs. | Pass |
+| Cancel Own Booking | From My Bookings, click Cancel on own booking. | Booking is removed and success message appears. | Pass |
+| Prevent Editing Others' Bookings | Try accessing edit URL for another user's booking directly. | Access is denied (403) or user is redirected. | Pass |
+| Initiate Payment | From My Bookings, click Pay now on a pending booking. | User is redirected to Stripe Checkout session. | Pass |
+| Peak/Off-Peak Pricing | Create bookings at different times (e.g., 09:00 vs 17:00) and check price display. | Peak times (17:00–20:00) show higher price than off-peak times. | Pass |
+| Save Slot | Use Save court/date/time button from Book Court page. | Slot appears in Saved/Bookmarked Slots section in My Bookings. | Pass |
+| Rebook from Saved Slot | Click Rebook link on a saved slot in My Bookings. | Book Court form pre-fills with saved court/date/time. | Pass |
+| View Past Bookings | Navigate to My Bookings with historical bookings present. | Past bookings are shown separately from upcoming bookings. | Pass |
+| Contact Support | Fill out the contact form with a message and optional booking reference. | Contact request is saved and success message appears. | Pass |
+| View About Page | Click About in the navigation menu. | About page loads with editable content from admin. | Pass |
+| Responsive Design | Test key pages on mobile (320px) and desktop (1200px+). | Layout adapts; no overlapping text or broken elements. | Pass |
 
-| User Story                 | Test                                                            |  Pass   |
-| -------------------------- | --------------------------------------------------------------- | :-----: |
-| paste here your user story | what is visible to the user and what action they should perform | &check; |
+#### Feature Manual Test Screenshots
 
-Attach screenshot.
+| Feature Area | Screenshot Evidence |
+| --- | --- |
+| Authentication (signup/login/logout) | `core\static\core\images\testing-images\feature-sign-in.png` |
+| Court discovery and filtering | `core\static\core\images\testing-images\feature-court-filtering.png` |
+| Booking creation and edit | `core\static\core\images\testing-images\feature-court-booking-form.png` |
+| Stripe payment success/cancel | `core\static\core\images\testing-images\feature-stripe.png` `core\static\core\images\testing-images\feature-stripe-confirm.png`|
+| Booking cancellation and history | `core\static\core\images\testing-images\feature-past-upcoming-bookings.png` |
+| Saved slots and quick rebook | `core\static\core\images\testing-images\feature-saved-slot.png` |
+| Contact support and About page | Contact Support: `core\static\core\images\testing-images\feature-contact.png` About page: `core\static\core\images\testing-images\feature-about-page.png` |
+| Admin booking/availability/refund actions | `core\static\core\images\testing-images\admin-test-change-booking.png` `core\static\core\images\testing-images\admin-test-court.png` |
 
-### Manual Testing features
+### Automated Testing Against User Stories
 
-Test all your features, you can use the same approach:
+Automated test results from `core/tests.py` using:
+`c:/Users/hanna/Desktop/final-hackathon/Hackathon-Project-2/.venv/Scripts/python.exe manage.py test core.tests -v 2`
 
-|   Feature   | Action     | Status  |
-| :---------: | :--------- | :------ |
-| description | user steps | &check; |
+Overall result: `31` tests run, `31` passed
 
-Attach screenshot.
+| Test Area (tests.py class) | What it validates | Result |
+| --- | --- | :---: |
+| `AvailabilityBookingTests` | Court availability filtering, maintenance/unavailable booking protection, and booking page fallback messaging. | Pass (`8/8`) |
+| `BookingAdminTests` | Booking admin registration, config, and admin/non-admin access control. | Partial (`4/4`) |
+| `BookingConfirmationTests` | Booking confirmation message behavior and duplicate slot prevention. | Partial (`3/3`) |
+| `CancelBookingTests` | Ownership checks and cancellation permissions (including forbidden/manual URL cases). | Pass (`4/4`) |
+| `CourtAdminTests` | Court admin registration and admin list configuration. | Pass (`2/2`) |
+| `PricingDisplayTests` | Peak/off-peak pricing helpers and UI price display in courts/payment/my bookings pages. | Pass (`5/5`) |
+| `SavedSlotTests` | Save/unsave slot behavior, duplicate prevention, and rebook links from saved slots. | Pass (`5/5`) |
+
 
 ## Bugs
 
