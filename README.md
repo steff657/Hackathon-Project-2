@@ -44,10 +44,10 @@ SetPoint is a full-stack Django web application that allows users to book tennis
 
 ## Contributors
 
-- `<Steffan>` - `<https://github.com/steff657>`
-- `<Hamza>` - `<https://github.com/hamza-m1>`
-- `<Hannah>` - `<https://github.com/hannahashe>`
-- `<Leila>` - `<https://github.com/leilacsak>`
+- Steffan - https://github.com/steff657
+- Hamza - https://github.com/hamza-m1
+- Hannah - https://github.com/hannahashe
+- Leila - https://github.com/leilacsak
 
 ## Overview
 
