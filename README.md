@@ -51,8 +51,8 @@ SetPoint is a full-stack Django web application that allows users to book tennis
 
 ## Overview
 
-SetPoint is a Django-based tennis court booking platform built for a team hackathon.  
- Users can discover available courts, book time slots, pay securely, and manage their bookings from a personal dashboard.
+SetPoint is a Django-based tennis court booking platform built for a team hackathon.
+Users can discover available courts, book time slots, pay securely, and manage their bookings from a personal dashboard.
 
 The app supports the full booking lifecycle:
 
@@ -109,7 +109,6 @@ The following wireframes were created for desktop and mobile views:
 - Desktop:
 
   ![Home Desktop Wireframe](wireframes/home_desktop.png)
-
 - Mobile:
 
   ![Home Mobile Wireframe](wireframes/home_mobile.png)
@@ -119,7 +118,6 @@ The following wireframes were created for desktop and mobile views:
 - Desktop:
 
   ![Courts Desktop Wireframe](wireframes/courts_desktop.png)
-
 - Mobile:
 
   ![Courts Mobile Wireframe](wireframes/courts_mobile.png)
@@ -129,7 +127,6 @@ The following wireframes were created for desktop and mobile views:
 - Desktop:
 
   ![Book Court Desktop Wireframe](wireframes/book_desktop.png)
-
 - Mobile:
 
   ![Book Court Mobile Wireframe](wireframes/book_mobile.png)
@@ -139,7 +136,6 @@ The following wireframes were created for desktop and mobile views:
 - Desktop:
 
   ![My Bookings Desktop Wireframe](wireframes/my_bookings_desktop.png)
-
 - Mobile:
 
   ![My Bookings Mobile Wireframe](wireframes/my_bookings_mobile.png)
@@ -183,8 +179,9 @@ The colour palette for SetPoint was designed to reflect a clean, modern sports t
 
 The application uses CSS variables defined in the `:root` selector to maintain a consistent design system across the interface:
 
+
 | Colour Name       | Colour Code | Preview                                                   |
-| ----------------- | ----------- | --------------------------------------------------------- |
+| ------------------- | ------------- | ----------------------------------------------------------- |
 | Background        | `#eef2f2`   | ![#eef2f2](https://singlecolorimage.com/get/eef2f2/15x15) |
 | Text (Ink)        | `#13231f`   | ![#13231f](https://singlecolorimage.com/get/13231f/15x15) |
 | Accent Green      | `#2f9e44`   | ![#2f9e44](https://singlecolorimage.com/get/2f9e44/15x15) |
@@ -196,7 +193,7 @@ The application uses CSS variables defined in the `:root` selector to maintain a
 
 The database schema for SetPoint is shown below, including the main models and their relationships.
 
-![ERD image](ReadME-Images/ERD.webp)
+![ERD image](read-me-images/ERD.png)
 
 SetPoint uses a relational database structure centred around bookings:
 
@@ -282,11 +279,15 @@ The following libraries and packages were used to support development, deploymen
 
 ## Testing
 
-Important part of your README.
-
 ### Google's Lighthouse Performance
 
-Screenshots of certain pages and scores (mobile and desktop).
+### Mobile
+
+![](assets/20260305_135857_googlelight-mobile.png)
+
+### Desktop
+
+![](assets/20260305_135912_googlelight-desktop.png)
 
 ### Browser Compatibility
 
@@ -296,7 +297,8 @@ PowerMapper flagged limited support for the CSS backdrop-filter property in olde
 
 ### Responsiveness
 
-Screenshots of the responsiveness, pick a few devices.
+
+![](assets/20260305_141654_responsive.png)
 
 ### Code Validation
 
@@ -304,8 +306,9 @@ Screenshots of the responsiveness, pick a few devices.
 
 All pages were validated as a guest and logged-in user using the [W3C HTML Validator](https://validator.w3.org/).
 
+
 | Page                                  | Result    |
-| ------------------------------------- | --------- |
+| --------------------------------------- | ----------- |
 | Home (`/`)                            | No errors |
 | Courts (`/courts/`)                   | No errors |
 | Book Court (`/book/<id>/`)            | No errors |
@@ -319,39 +322,59 @@ Screenshot of validation results:
 
 ![HTML validation](testing/html_validation.png)
 
+#### PEP8 / Python Linting
+
+Python code style was checked with a linter and the output is shown below:
+
+![PEP8 and pylint results](testing/pylint_results.png)
+
+The report highlights a small number of style warnings (for example line length, spacing, and docstring formatting) rather than functional errors. These are non-blocking issues, and the application still runs and passes the automated test suite.
+
+![](assets/20260305_135254_court.png)
+
+![](assets/20260305_135254_initial.png)
+
+![](assets/20260305_135254_booking_payment.png)
+
+![](assets/20260305_135254_booking_user.png)
+
+![](assets/20260305_135254_booking_owner.png)
+
 ### Feature Manual Testing
 
-| Feature | How to Test | Expected Result | Result |
-| --- | --- | --- | :---: |
-| User Registration | Navigate to Sign Up, enter email, username, and password, then submit. | Account is created and user can log in. | Pass |
-| User Login/Logout | Log in with valid credentials; verify access to My Bookings; then log out. | User session is authenticated when logged in; redirected after logout. | Pass |
-| Court Listing & Filtering | Open Courts page; filter by surface type and/or date. | Courts display with correct surface filters applied; unavailable courts hidden. | Pass |
-| View Court Availability | Open Courts or Book Court page and check available time slots. | Available slots are shown; booked/unavailable slots are not selectable. | Pass |
-| Create Booking | Select a court, date, and time, then submit the booking form. | Booking is created and appears in My Bookings with Pending payment status. | Pass |
-| Edit Own Booking | From My Bookings, click Edit on own booking and change date/time. | Changes are saved; no overbooking or conflict occurs. | Pass |
-| Cancel Own Booking | From My Bookings, click Cancel on own booking. | Booking is removed and success message appears. | Pass |
-| Prevent Editing Others' Bookings | Try accessing edit URL for another user's booking directly. | Access is denied (403) or user is redirected. | Pass |
-| Initiate Payment | From My Bookings, click Pay now on a pending booking. | User is redirected to Stripe Checkout session. | Pass |
-| Peak/Off-Peak Pricing | Create bookings at different times (e.g., 09:00 vs 17:00) and check price display. | Peak times (17:00–20:00) show higher price than off-peak times. | Pass |
-| Save Slot | Use Save court/date/time button from Book Court page. | Slot appears in Saved/Bookmarked Slots section in My Bookings. | Pass |
-| Rebook from Saved Slot | Click Rebook link on a saved slot in My Bookings. | Book Court form pre-fills with saved court/date/time. | Pass |
-| View Past Bookings | Navigate to My Bookings with historical bookings present. | Past bookings are shown separately from upcoming bookings. | Pass |
-| Contact Support | Fill out the contact form with a message and optional booking reference. | Contact request is saved and success message appears. | Pass |
-| View About Page | Click About in the navigation menu. | About page loads with editable content from admin. | Pass |
-| Responsive Design | Test key pages on mobile (320px) and desktop (1200px+). | Layout adapts; no overlapping text or broken elements. | Pass |
+
+| Feature                          | How to Test                                                                        | Expected Result                                                                 | Result |
+| ---------------------------------- | ------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------- | :------: |
+| User Registration                | Navigate to Sign Up, enter email, username, and password, then submit.             | Account is created and user can log in.                                         |  Pass  |
+| User Login/Logout                | Log in with valid credentials; verify access to My Bookings; then log out.         | User session is authenticated when logged in; redirected after logout.          |  Pass  |
+| Court Listing & Filtering        | Open Courts page; filter by surface type and/or date.                              | Courts display with correct surface filters applied; unavailable courts hidden. |  Pass  |
+| View Court Availability          | Open Courts or Book Court page and check available time slots.                     | Available slots are shown; booked/unavailable slots are not selectable.         |  Pass  |
+| Create Booking                   | Select a court, date, and time, then submit the booking form.                      | Booking is created and appears in My Bookings with Pending payment status.      |  Pass  |
+| Edit Own Booking                 | From My Bookings, click Edit on own booking and change date/time.                  | Changes are saved; no overbooking or conflict occurs.                           |  Pass  |
+| Cancel Own Booking               | From My Bookings, click Cancel on own booking.                                     | Booking is removed and success message appears.                                 |  Pass  |
+| Prevent Editing Others' Bookings | Try accessing edit URL for another user's booking directly.                        | Access is denied (403) or user is redirected.                                   |  Pass  |
+| Initiate Payment                 | From My Bookings, click Pay now on a pending booking.                              | User is redirected to Stripe Checkout session.                                  |  Pass  |
+| Peak/Off-Peak Pricing            | Create bookings at different times (e.g., 09:00 vs 17:00) and check price display. | Peak times (17:00–20:00) show higher price than off-peak times.                |  Pass  |
+| Save Slot                        | Use Save court/date/time button from Book Court page.                              | Slot appears in Saved/Bookmarked Slots section in My Bookings.                  |  Pass  |
+| Rebook from Saved Slot           | Click Rebook link on a saved slot in My Bookings.                                  | Book Court form pre-fills with saved court/date/time.                           |  Pass  |
+| View Past Bookings               | Navigate to My Bookings with historical bookings present.                          | Past bookings are shown separately from upcoming bookings.                      |  Pass  |
+| Contact Support                  | Fill out the contact form with a message and optional booking reference.           | Contact request is saved and success message appears.                           |  Pass  |
+| View About Page                  | Click About in the navigation menu.                                                | About page loads with editable content from admin.                              |  Pass  |
+| Responsive Design                | Test key pages on mobile (320px) and desktop (1200px+).                            | Layout adapts; no overlapping text or broken elements.                          |  Pass  |
 
 #### Feature Manual Test Screenshots
 
-| Feature Area | Screenshot Evidence |
-| --- | --- |
-| Authentication (signup/login/logout) | `core\static\core\images\testing-images\feature-sign-in.png` |
-| Court discovery and filtering | `core\static\core\images\testing-images\feature-court-filtering.png` |
-| Booking creation and edit | `core\static\core\images\testing-images\feature-court-booking-form.png` |
-| Stripe payment success/cancel | `core\static\core\images\testing-images\feature-stripe.png` `core\static\core\images\testing-images\feature-stripe-confirm.png`|
-| Booking cancellation and history | `core\static\core\images\testing-images\feature-past-upcoming-bookings.png` |
-| Saved slots and quick rebook | `core\static\core\images\testing-images\feature-saved-slot.png` |
-| Contact support and About page | Contact Support: `core\static\core\images\testing-images\feature-contact.png` About page: `core\static\core\images\testing-images\feature-about-page.png` |
-| Admin booking/availability/refund actions | `core\static\core\images\testing-images\admin-test-change-booking.png` `core\static\core\images\testing-images\admin-test-court.png` |
+
+| Feature Area                              | Screenshot Evidence                                                                                                                                      |
+| ------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Authentication (signup/login/logout)      | `core\static\core\images\testing-images\feature-sign-in.png`                                                                                             |
+| Court discovery and filtering             | `core\static\core\images\testing-images\feature-court-filtering.png`                                                                                     |
+| Booking creation and edit                 | `core\static\core\images\testing-images\feature-court-booking-form.png`                                                                                  |
+| Stripe payment success/cancel             | `core\static\core\images\testing-images\feature-stripe.png` `core\static\core\images\testing-images\feature-stripe-confirm.png`                          |
+| Booking cancellation and history          | `core\static\core\images\testing-images\feature-past-upcoming-bookings.png`                                                                              |
+| Saved slots and quick rebook              | `core\static\core\images\testing-images\feature-saved-slot.png`                                                                                          |
+| Contact support and About page            | Contact Support:`core\static\core\images\testing-images\feature-contact.png` About page: `core\static\core\images\testing-images\feature-about-page.png` |
+| Admin booking/availability/refund actions | `core\static\core\images\testing-images\admin-test-change-booking.png` `core\static\core\images\testing-images\admin-test-court.png`                     |
 
 ### Automated Testing Against User Stories
 
@@ -360,16 +383,16 @@ Automated test results from `core/tests.py` using:
 
 Overall result: `31` tests run, `31` passed
 
-| Test Area (tests.py class) | What it validates | Result |
-| --- | --- | :---: |
-| `AvailabilityBookingTests` | Court availability filtering, maintenance/unavailable booking protection, and booking page fallback messaging. | Pass (`8/8`) |
-| `BookingAdminTests` | Booking admin registration, config, and admin/non-admin access control. | Partial (`4/4`) |
-| `BookingConfirmationTests` | Booking confirmation message behavior and duplicate slot prevention. | Partial (`3/3`) |
-| `CancelBookingTests` | Ownership checks and cancellation permissions (including forbidden/manual URL cases). | Pass (`4/4`) |
-| `CourtAdminTests` | Court admin registration and admin list configuration. | Pass (`2/2`) |
-| `PricingDisplayTests` | Peak/off-peak pricing helpers and UI price display in courts/payment/my bookings pages. | Pass (`5/5`) |
-| `SavedSlotTests` | Save/unsave slot behavior, duplicate prevention, and rebook links from saved slots. | Pass (`5/5`) |
 
+| Test Area (tests.py class) | What it validates                                                                                              |     Result     |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------------- | :---------------: |
+| `AvailabilityBookingTests` | Court availability filtering, maintenance/unavailable booking protection, and booking page fallback messaging. |  Pass (`8/8`)  |
+| `BookingAdminTests`        | Booking admin registration, config, and admin/non-admin access control.                                        | Partial (`4/4`) |
+| `BookingConfirmationTests` | Booking confirmation message behavior and duplicate slot prevention.                                           | Partial (`3/3`) |
+| `CancelBookingTests`       | Ownership checks and cancellation permissions (including forbidden/manual URL cases).                          |  Pass (`4/4`)  |
+| `CourtAdminTests`          | Court admin registration and admin list configuration.                                                         |  Pass (`2/2`)  |
+| `PricingDisplayTests`      | Peak/off-peak pricing helpers and UI price display in courts/payment/my bookings pages.                        |  Pass (`5/5`)  |
+| `SavedSlotTests`           | Save/unsave slot behavior, duplicate prevention, and rebook links from saved slots.                            |  Pass (`5/5`)  |
 
 ## Bugs
 
