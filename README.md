@@ -194,7 +194,19 @@ The application uses CSS variables defined in the `:root` selector to maintain a
 
 ### Database Diagram
 
-Image of the database diagram for your project, including your database models and how they are connected.
+The database schema for SetPoint is shown below, including the main models and their relationships.
+
+![SetPoint ERD](ReadME-Images/ERD_SetPoint.webp)
+
+SetPoint uses a relational database structure centred around bookings:
+
+- **Court** stores court details (number, surface type, availability, and maintenance windows).
+- **Booking** stores reservation data (player details, date/time, court number, and payment status).
+- **SavedSlot** lets authenticated users save preferred date/time/court combinations for quick rebooking.
+- **ContactRequest** stores support/refund enquiries and can optionally link to a specific booking.
+- **About** stores editable About page content managed through the admin panel.
+
+Relationships are mainly driven by Django `ForeignKey` fields: one user can have many bookings, saved slots, and contact requests; and one booking can have multiple related contact requests.
 
 ## Features:
 
