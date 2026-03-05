@@ -177,6 +177,42 @@ class AvailabilityBookingTests(TestCase):
         self.assertContains(response, "under maintenance")
         self.assertEqual(Booking.objects.count(), 0)
 
+    def test_cannot_book_before_opening_hours(self):
+        self.client.force_login(self.owner)
+        response = self.client.post(
+            reverse("book_court"),
+            {
+                "player_name": "Early Player",
+                "player_email": "early@example.com",
+                "date": "2026-03-11",
+                "start_time": "08:00",
+                "duration_minutes": 60,
+                "court_number": 10,
+                "notes": "Too early",
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Bookings are only available between 09:00 and 17:00.")
+        self.assertEqual(Booking.objects.count(), 0)
+
+    def test_cannot_book_after_closing_hours(self):
+        self.client.force_login(self.owner)
+        response = self.client.post(
+            reverse("book_court"),
+            {
+                "player_name": "Late Player",
+                "player_email": "late@example.com",
+                "date": "2026-03-11",
+                "start_time": "17:00",
+                "duration_minutes": 60,
+                "court_number": 10,
+                "notes": "Too late",
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Bookings are only available between 09:00 and 17:00.")
+        self.assertEqual(Booking.objects.count(), 0)
+
     def test_existing_bookings_stay_visible_even_if_court_becomes_unavailable(self):
         Booking.objects.create(
             player_name="Legacy Booking",
@@ -472,14 +508,12 @@ class PricingDisplayTests(TestCase):
     def test_courts_page_shows_price_and_peak_offpeak_policy(self):
         response = self.client.get(reverse("courts"))
         off_peak_price = get_slot_pricing("09:00", settings.STRIPE_CURRENCY)["price_display"]
-        peak_price = get_slot_pricing("17:00", settings.STRIPE_CURRENCY)["price_display"]
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Peak and Off-peak Pricing Policy")
+        self.assertContains(response, "Booking window: 09:00-17:00")
         self.assertContains(response, "Off-peak")
-        self.assertContains(response, "Peak")
         self.assertContains(response, off_peak_price)
-        self.assertContains(response, peak_price)
 
     def test_payment_success_shows_price_summary(self):
         booking = Booking.objects.create(

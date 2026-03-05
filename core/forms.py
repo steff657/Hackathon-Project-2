@@ -1,9 +1,13 @@
-from datetime import datetime, timedelta
+from datetime import datetime, time, timedelta
 from allauth.account.forms import LoginForm, SignupForm
 from django import forms
 from django.core.exceptions import ValidationError
 
 from .models import Booking, ContactRequest, Court
+
+BOOKING_OPEN_TIME = time(9, 0)
+BOOKING_CLOSE_TIME = time(17, 0)
+LAST_HOURLY_START_TIME = time(16, 0)
 
 
 class BookingForm(forms.ModelForm):
@@ -26,7 +30,14 @@ class BookingForm(forms.ModelForm):
         ]
         widgets = {
             "date": forms.DateInput(attrs={"type": "date"}),
-            "start_time": forms.TimeInput(attrs={"type": "time"}),
+            "start_time": forms.TimeInput(
+                attrs={
+                    "type": "time",
+                    "min": BOOKING_OPEN_TIME.strftime("%H:%M"),
+                    "max": LAST_HOURLY_START_TIME.strftime("%H:%M"),
+                    "step": "3600",
+                }
+            ),
             "notes": forms.Textarea(attrs={"rows": 3}),
         }
 
@@ -44,9 +55,12 @@ class BookingForm(forms.ModelForm):
                 court_number = int(self.data.get("court_number"))
                 court = Court.objects.filter(number=court_number).first()
                 if court:
+                    effective_open = max(court.opening_time, BOOKING_OPEN_TIME)
+                    effective_close = min(court.closing_time, BOOKING_CLOSE_TIME)
+                    latest_hourly_start = time(max(effective_open.hour, effective_close.hour - 1), 0)
                     self.fields["start_time"].widget.attrs.update({
-                        "min": court.opening_time.strftime("%H:%M"),
-                        "max": court.closing_time.strftime("%H:%M"),
+                        "min": effective_open.strftime("%H:%M"),
+                        "max": latest_hourly_start.strftime("%H:%M"),
                         "step": "3600",  # 1 hour intervals
                     })
             except (ValueError, TypeError):
@@ -137,6 +151,19 @@ class BookingForm(forms.ModelForm):
             self.add_error(
                 "start_time",
                 f"Court closes at {court.closing_time.strftime('%H:%M')}. This booking would end too late."
+            )
+
+        # Enforce platform-wide bookable window (09:00 to 17:00).
+        if booking_time < BOOKING_OPEN_TIME:
+            self.add_error(
+                "start_time",
+                "Bookings are only available between 09:00 and 17:00.",
+            )
+
+        if end_datetime.time() > BOOKING_CLOSE_TIME:
+            self.add_error(
+                "start_time",
+                "Bookings are only available between 09:00 and 17:00.",
             )
 
         existing_slot_bookings = Booking.objects.filter(
