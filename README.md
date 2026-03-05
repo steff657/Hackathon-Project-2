@@ -109,6 +109,7 @@ The following wireframes were created for desktop and mobile views:
 - Desktop:
 
   ![Home Desktop Wireframe](wireframes/home_desktop.png)
+
 - Mobile:
 
   ![Home Mobile Wireframe](wireframes/home_mobile.png)
@@ -118,6 +119,7 @@ The following wireframes were created for desktop and mobile views:
 - Desktop:
 
   ![Courts Desktop Wireframe](wireframes/courts_desktop.png)
+
 - Mobile:
 
   ![Courts Mobile Wireframe](wireframes/courts_mobile.png)
@@ -127,6 +129,7 @@ The following wireframes were created for desktop and mobile views:
 - Desktop:
 
   ![Book Court Desktop Wireframe](wireframes/book_desktop.png)
+
 - Mobile:
 
   ![Book Court Mobile Wireframe](wireframes/book_mobile.png)
@@ -136,6 +139,7 @@ The following wireframes were created for desktop and mobile views:
 - Desktop:
 
   ![My Bookings Desktop Wireframe](wireframes/my_bookings_desktop.png)
+
 - Mobile:
 
   ![My Bookings Mobile Wireframe](wireframes/my_bookings_mobile.png)
@@ -179,9 +183,8 @@ The colour palette for SetPoint was designed to reflect a clean, modern sports t
 
 The application uses CSS variables defined in the `:root` selector to maintain a consistent design system across the interface:
 
-
 | Colour Name       | Colour Code | Preview                                                   |
-| ------------------- | ------------- | ----------------------------------------------------------- |
+| ----------------- | ----------- | --------------------------------------------------------- |
 | Background        | `#eef2f2`   | ![#eef2f2](https://singlecolorimage.com/get/eef2f2/15x15) |
 | Text (Ink)        | `#13231f`   | ![#13231f](https://singlecolorimage.com/get/13231f/15x15) |
 | Accent Green      | `#2f9e44`   | ![#2f9e44](https://singlecolorimage.com/get/2f9e44/15x15) |
@@ -305,9 +308,8 @@ PowerMapper flagged limited support for the CSS backdrop-filter property in olde
 
 All pages were validated as a guest and logged-in user using the [W3C HTML Validator](https://validator.w3.org/).
 
-
 | Page                                  | Result    |
-| --------------------------------------- | ----------- |
+| ------------------------------------- | --------- |
 | Home (`/`)                            | No errors |
 | Courts (`/courts/`)                   | No errors |
 | Book Court (`/book/<id>/`)            | No errors |
@@ -320,6 +322,18 @@ All pages were validated as a guest and logged-in user using the [W3C HTML Valid
 Screenshot of validation results:
 
 ![HTML validation](testing/html_validation.png)
+
+#### CSS Validation
+
+CSS was validated using the [W3C CSS Validator](https://jigsaw.w3.org/css-validator/).
+
+| File                          | Result    |
+| ----------------------------- | --------- |
+| `core/static/core/styles.css` | No errors |
+
+Screenshot of validation results:
+
+![CSS validation](testing/css_validation.png)
 
 #### PEP8 / Python Linting
 
@@ -341,9 +355,8 @@ The report highlights a small number of style warnings (for example line length,
 
 ### Feature Manual Testing
 
-
 | Feature                          | How to Test                                                                        | Expected Result                                                                 | Result |
-| ---------------------------------- | ------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------- | :------: |
+| -------------------------------- | ---------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- | :----: |
 | User Registration                | Navigate to Sign Up, enter email, username, and password, then submit.             | Account is created and user can log in.                                         |  Pass  |
 | User Login/Logout                | Log in with valid credentials; verify access to My Bookings; then log out.         | User session is authenticated when logged in; redirected after logout.          |  Pass  |
 | Court Listing & Filtering        | Open Courts page; filter by surface type and/or date.                              | Courts display with correct surface filters applied; unavailable courts hidden. |  Pass  |
@@ -353,7 +366,7 @@ The report highlights a small number of style warnings (for example line length,
 | Cancel Own Booking               | From My Bookings, click Cancel on own booking.                                     | Booking is removed and success message appears.                                 |  Pass  |
 | Prevent Editing Others' Bookings | Try accessing edit URL for another user's booking directly.                        | Access is denied (403) or user is redirected.                                   |  Pass  |
 | Initiate Payment                 | From My Bookings, click Pay now on a pending booking.                              | User is redirected to Stripe Checkout session.                                  |  Pass  |
-| Peak/Off-Peak Pricing            | Create bookings at different times (e.g., 09:00 vs 17:00) and check price display. | Peak times (17:00–20:00) show higher price than off-peak times.                |  Pass  |
+| Peak/Off-Peak Pricing            | Create bookings at different times (e.g., 09:00 vs 17:00) and check price display. | Peak times (17:00–20:00) show higher price than off-peak times.                 |  Pass  |
 | Save Slot                        | Use Save court/date/time button from Book Court page.                              | Slot appears in Saved/Bookmarked Slots section in My Bookings.                  |  Pass  |
 | Rebook from Saved Slot           | Click Rebook link on a saved slot in My Bookings.                                  | Book Court form pre-fills with saved court/date/time.                           |  Pass  |
 | View Past Bookings               | Navigate to My Bookings with historical bookings present.                          | Past bookings are shown separately from upcoming bookings.                      |  Pass  |
@@ -363,9 +376,8 @@ The report highlights a small number of style warnings (for example line length,
 
 #### Feature Manual Test Screenshots
 
-
 | Feature Area                              | Screenshot Evidence                                                                                                                                      |
-| ------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ----------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Authentication (signup/login/logout)      | `core\static\core\images\testing-images\feature-sign-in.png`                                                                                             |
 | Court discovery and filtering             | `core\static\core\images\testing-images\feature-court-filtering.png`                                                                                     |
 | Booking creation and edit                 | `core\static\core\images\testing-images\feature-court-booking-form.png`                                                                                  |
@@ -382,16 +394,15 @@ Automated test results from `core/tests.py` using:
 
 Overall result: `31` tests run, `31` passed
 
-
-| Test Area (tests.py class) | What it validates                                                                                              |     Result     |
-| ---------------------------- | ---------------------------------------------------------------------------------------------------------------- | :---------------: |
-| `AvailabilityBookingTests` | Court availability filtering, maintenance/unavailable booking protection, and booking page fallback messaging. |  Pass (`8/8`)  |
+| Test Area (tests.py class) | What it validates                                                                                              |     Result      |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------- | :-------------: |
+| `AvailabilityBookingTests` | Court availability filtering, maintenance/unavailable booking protection, and booking page fallback messaging. |  Pass (`8/8`)   |
 | `BookingAdminTests`        | Booking admin registration, config, and admin/non-admin access control.                                        | Partial (`4/4`) |
 | `BookingConfirmationTests` | Booking confirmation message behavior and duplicate slot prevention.                                           | Partial (`3/3`) |
-| `CancelBookingTests`       | Ownership checks and cancellation permissions (including forbidden/manual URL cases).                          |  Pass (`4/4`)  |
-| `CourtAdminTests`          | Court admin registration and admin list configuration.                                                         |  Pass (`2/2`)  |
-| `PricingDisplayTests`      | Peak/off-peak pricing helpers and UI price display in courts/payment/my bookings pages.                        |  Pass (`5/5`)  |
-| `SavedSlotTests`           | Save/unsave slot behavior, duplicate prevention, and rebook links from saved slots.                            |  Pass (`5/5`)  |
+| `CancelBookingTests`       | Ownership checks and cancellation permissions (including forbidden/manual URL cases).                          |  Pass (`4/4`)   |
+| `CourtAdminTests`          | Court admin registration and admin list configuration.                                                         |  Pass (`2/2`)   |
+| `PricingDisplayTests`      | Peak/off-peak pricing helpers and UI price display in courts/payment/my bookings pages.                        |  Pass (`5/5`)   |
+| `SavedSlotTests`           | Save/unsave slot behavior, duplicate prevention, and rebook links from saved slots.                            |  Pass (`5/5`)   |
 
 ## Bugs
 

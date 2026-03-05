@@ -7,14 +7,24 @@
   --glass-bg: #ffffff;
   --glass-blur: blur(4px);
   --glow-tint: #dfff75;
-  --glow-border: color-mix(in srgb, var(--accent) 72%, var(--glow-tint) 28%);
-  --glow-ring: 0 0 0 2px
-    color-mix(in srgb, var(--accent) 58%, var(--glow-tint) 42%);
-  --glow-aura-color: color-mix(
-    in srgb,
-    var(--accent) 52%,
-    var(--glow-tint) 48%
-  );
+
+  /* Fallbacks for validators */
+  --glow-border: #8bcf5a;
+  --glow-ring: 0 0 0 2px #8bcf5a;
+  --glow-aura-color: #a6d96a;
+}
+
+@supports (color: color-mix(in srgb, red, blue)) {
+  :root {
+    --glow-border: color-mix(in srgb, var(--accent) 72%, var(--glow-tint) 28%);
+    --glow-ring: 0 0 0 2px
+      color-mix(in srgb, var(--accent) 58%, var(--glow-tint) 42%);
+    --glow-aura-color: color-mix(
+      in srgb,
+      var(--accent) 52%,
+      var(--glow-tint) 48%
+    );
+  }
 }
 
 body {
